@@ -4,8 +4,9 @@ RUN npm install -g pnpm
 
 WORKDIR /usr/src/app
 
-COPY package.json pnpm-lock.yaml .env tsconfig.json ./
+COPY package.json pnpm-lock.yaml .env tsconfig.json drizzle.config.ts ./
 COPY server.ts rabbitmq.ts ./
+COPY drizzle/ ./drizzle
 
 RUN pnpm install
 
