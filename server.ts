@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
-import { checkRabbitMQAndCreateQueues, sendToQueue } from '@/rabbitmq';
+import { initRabbitMQ, sendToQueue } from '@/rabbitmq';
 
 dotenv.config();
 const app = express();
@@ -16,15 +16,11 @@ const io = new Server(server, {
     }
 });
 
-checkRabbitMQAndCreateQueues();
+initRabbitMQ();
 
 app.post('/webhook', (req, res) => {
-    const payload = req.body;
-    // const event = req.headers['x-gitlab-event'];
-    console.log('Webhook', payload);
-    // io.emit('merge-request', payload);
     try {
-        sendToQueue('merge-requests', payload);
+        sendToQueue('merge-requests', req.body);
         res.status(200).end();
     } catch (err) {
         res.status(400).send('Error pushing message to the queue.');
