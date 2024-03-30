@@ -11,9 +11,9 @@ const createQueues = async (channel: amqp.Channel) => {
     try {
         for (const queue of queues) {
             await channel.assertQueue(queue, { durable: true });
+            createQueueConsumer(queue, channel);
             console.log(`Queue ${queue} created successfully.`);
         }
-        createQueueConsumers(channel);
         console.log('All queues created successfully.');
     } catch (err) {
         console.error('Error creating queues:', err);
@@ -40,15 +40,21 @@ export const sendToQueue = async (queue: Queue, message: any) => {
     await connection.close();
 };
 
-const createQueueConsumers = (channel: amqp.Channel) => {
-    channel.consume('merge-requests', (msg) => {
-        if (!msg) {
-            console.log('Consumer merge-requests cancelled by server.');
-            return;
-        }
+const createQueueConsumer = (queue: Queue, channel: amqp.Channel) => {
+    switch (queue) {
+        case 'merge-requests':
+            channel.consume(queue, (msg) => {
+                if (!msg) {
+                    console.log('Consumer merge-requests cancelled by server.');
+                    return;
+                }
 
-        const message = JSON.parse(msg.content.toString());
-        console.log('Received message from RabbitMQ:', message);
-        channel.ack(msg);
-    });
+                const message = JSON.parse(msg.content.toString());
+                console.log('Received message from RabbitMQ:', message);
+                channel.ack(msg);
+            });
+            break;
+        default:
+            throw Error(`Missing consumer for queue ${queue}.`);
+    }
 };
