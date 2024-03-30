@@ -1,4 +1,8 @@
 import amqp from 'amqplib';
+import { db } from '@/drizzle/db';
+import { mergeRequestsTable } from '@/drizzle/schema';
+import { z } from 'zod';
+import { eq } from 'drizzle-orm';
 
 type Queue = 'merge-requests';
 
@@ -16,7 +20,7 @@ const createQueues = async (channel: amqp.Channel) => {
         }
         console.log('All queues created successfully.');
     } catch (err) {
-        console.error('Error creating queues:', err);
+        console.error('Error creating queues.', err);
         process.exit(1);
     }
 };
@@ -43,15 +47,37 @@ export const sendToQueue = async (queue: Queue, message: any) => {
 const createQueueConsumer = (queue: Queue, channel: amqp.Channel) => {
     switch (queue) {
         case 'merge-requests':
-            channel.consume(queue, (msg) => {
+            channel.consume(queue, async (msg) => {
                 if (!msg) {
-                    console.log('Consumer merge-requests cancelled by server.');
+                    console.log(`Consumer ${queue} cancelled by server.`);
                     return;
                 }
 
-                const message = JSON.parse(msg.content.toString());
-                console.log('Received message from RabbitMQ:', message);
-                channel.ack(msg);
+                try {
+                    const message = JSON.parse(msg.content.toString());
+
+                    const schema = z.object({
+                        object_attributes: z.object({
+                            id: z.number(),
+                            author_id: z.number()
+                        })
+                    });
+
+                    const {
+                        object_attributes: { id, author_id }
+                    } = schema.parse(message);
+
+                    const result = await db.select({ id: mergeRequestsTable.id }).from(mergeRequestsTable).where(eq(mergeRequestsTable.id, id));
+
+                    if (!result.length) {
+                        await db.insert(mergeRequestsTable).values({ id, authorId: author_id, json: message });
+                    } else {
+                        await db.update(mergeRequestsTable).set({ id, authorId: author_id, json: message });
+                    }
+                    channel.ack(msg);
+                } catch (err) {
+                    console.error(`Could not consume ${queue} message.`, err);
+                }
             });
             break;
         default:
