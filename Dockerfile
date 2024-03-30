@@ -4,7 +4,8 @@ RUN npm install -g pnpm
 
 WORKDIR /usr/src/app
 
-COPY package.json pnpm-lock.yaml server.ts .env tsconfig.json ./
+COPY package.json pnpm-lock.yaml .env tsconfig.json ./
+COPY server.ts rabbitmq.ts ./
 
 RUN pnpm install
 

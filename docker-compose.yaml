@@ -5,3 +5,14 @@ services:
         build: .
         ports:
             - '${PORT}:${PORT}'
+        depends_on:
+            - rabbitmq
+    rabbitmq:
+        container_name: rabbitmq
+        image: rabbitmq:3-management
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        volumes:
+            - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+            - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
