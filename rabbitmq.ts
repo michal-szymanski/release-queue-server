@@ -1,5 +1,5 @@
 import amqp from 'amqplib';
-import { emitAllMergeRequests, emitQueue } from '@/websocket';
+import { emitMergeRequests, emitQueue } from '@/websocket';
 import { processMergeRequestAction } from '@/drizzle/queries';
 import { mergeRequestSchema } from '@/types';
 
@@ -60,8 +60,8 @@ const createQueueConsumer = (queue: Queue, channel: amqp.Channel) => {
                     } = mergeRequestSchema.parse(message);
 
                     await processMergeRequestAction(id, author_id, message, action);
-                    await emitAllMergeRequests();
                     await emitQueue();
+                    await emitMergeRequests();
                     channel.ack(msg);
                 } catch (err) {
                     console.error(`Could not consume ${queue} message.`, err);

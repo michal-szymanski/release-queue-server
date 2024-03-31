@@ -1,10 +1,14 @@
 import { db } from '@/drizzle/db';
 import { mergeRequestsTable, queueTable } from '@/drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { eq, isNull } from 'drizzle-orm';
 import { MergeRequestAction } from '@/types';
 
-export const getAllMergeRequests = async () => {
-    return db.select({ json: mergeRequestsTable.json }).from(mergeRequestsTable);
+export const getMergeRequests = async () => {
+    return db
+        .select({ json: mergeRequestsTable.json })
+        .from(mergeRequestsTable)
+        .leftJoin(queueTable, eq(queueTable.mergeRequestId, mergeRequestsTable.id))
+        .where(isNull(queueTable.mergeRequestId));
 };
 
 const addMergeRequest = async (id: number, authorId: number, json: unknown) => {
