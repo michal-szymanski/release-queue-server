@@ -1,19 +1,49 @@
 import { db } from '@/drizzle/db';
 import { mergeRequestsTable, queueTable } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
+import { MergeRequestAction } from '@/types';
 
 export const getAllMergeRequests = async () => {
     return db.select({ json: mergeRequestsTable.json }).from(mergeRequestsTable);
 };
 
-export const insertOrUpdateMergeRequests = async (id: number, authorId: number, json: any) => {
-    const result = await db.select({ id: mergeRequestsTable.id }).from(mergeRequestsTable).where(eq(mergeRequestsTable.id, id));
+const addMergeRequest = async (id: number, authorId: number, json: unknown) => {
+    await db.insert(mergeRequestsTable).values({ id, authorId, json });
+};
 
-    if (!result.length) {
-        await db.insert(mergeRequestsTable).values({ id, authorId, json });
-        return;
+const deleteMergeRequest = async (id: number) => {
+    await db.delete(mergeRequestsTable).where(eq(mergeRequestsTable.id, id));
+};
+
+const updateMergeRequest = async (id: number, json: unknown) => {
+    await db.update(mergeRequestsTable).set({ json }).where(eq(mergeRequestsTable.id, id));
+};
+
+const isMergeRequestInDb = async (id: number) => {
+    const results = await db.select({ id: mergeRequestsTable.id }).from(mergeRequestsTable).where(eq(mergeRequestsTable.id, id));
+    return results.length === 1;
+};
+
+export const processMergeRequestAction = async (id: number, authorId: number, json: unknown, action?: MergeRequestAction) => {
+    switch (action) {
+        case 'open':
+        case 'reopen':
+            await addMergeRequest(id, authorId, json);
+            break;
+        case 'merge':
+        case 'close':
+            await removeFromQueue(id);
+            await deleteMergeRequest(id);
+            break;
+        default:
+            const exists = await isMergeRequestInDb(id);
+            if (exists) {
+                await updateMergeRequest(id, json);
+                break;
+            }
+            await addMergeRequest(id, authorId, json);
+            break;
     }
-    await db.update(mergeRequestsTable).set({ id, authorId, json });
 };
 
 export const qetQueue = async () => {

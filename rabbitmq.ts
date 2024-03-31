@@ -1,7 +1,7 @@
 import amqp from 'amqplib';
-import { z } from 'zod';
-import { emitAllMergeRequests } from '@/websocket';
-import { insertOrUpdateMergeRequests } from '@/drizzle/queries';
+import { emitAllMergeRequests, emitQueue } from '@/websocket';
+import { processMergeRequestAction } from '@/drizzle/queries';
+import { mergeRequestSchema } from '@/types';
 
 type Queue = 'merge-requests';
 
@@ -55,18 +55,14 @@ const createQueueConsumer = (queue: Queue, channel: amqp.Channel) => {
                 try {
                     const message = JSON.parse(msg.content.toString());
 
-                    const schema = z.object({
-                        object_attributes: z.object({
-                            id: z.number(),
-                            author_id: z.number()
-                        })
-                    });
-
                     const {
-                        object_attributes: { id, author_id }
-                    } = schema.parse(message);
+                        object_attributes: { id, author_id, action }
+                    } = mergeRequestSchema.parse(message);
 
-                    await insertOrUpdateMergeRequests(id, author_id, message);
+                    await processMergeRequestAction(id, author_id, message, action);
+                    if (action === 'merge' || action === 'close') {
+                        await emitQueue();
+                    }
                     await emitAllMergeRequests();
                     channel.ack(msg);
                 } catch (err) {
