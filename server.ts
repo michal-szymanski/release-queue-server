@@ -1,20 +1,8 @@
-import express from 'express';
-import { createServer } from 'node:http';
-import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import { initRabbitMQ, sendToQueue } from '@/rabbitmq';
+import { app, server } from '@/express';
 
 dotenv.config();
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-const server = createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: process.env.WEB_APP_URL
-    }
-});
 
 initRabbitMQ();
 

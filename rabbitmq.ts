@@ -1,8 +1,7 @@
 import amqp from 'amqplib';
-import { db } from '@/drizzle/db';
-import { mergeRequestsTable } from '@/drizzle/schema';
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { emitAllMergeRequests } from '@/websocket';
+import { insertOrUpdateMergeRequests } from '@/drizzle/queries';
 
 type Queue = 'merge-requests';
 
@@ -67,13 +66,8 @@ const createQueueConsumer = (queue: Queue, channel: amqp.Channel) => {
                         object_attributes: { id, author_id }
                     } = schema.parse(message);
 
-                    const result = await db.select({ id: mergeRequestsTable.id }).from(mergeRequestsTable).where(eq(mergeRequestsTable.id, id));
-
-                    if (!result.length) {
-                        await db.insert(mergeRequestsTable).values({ id, authorId: author_id, json: message });
-                    } else {
-                        await db.update(mergeRequestsTable).set({ id, authorId: author_id, json: message });
-                    }
+                    await insertOrUpdateMergeRequests(id, author_id, message);
+                    await emitAllMergeRequests();
                     channel.ack(msg);
                 } catch (err) {
                     console.error(`Could not consume ${queue} message.`, err);
