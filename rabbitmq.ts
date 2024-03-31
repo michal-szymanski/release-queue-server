@@ -60,10 +60,8 @@ const createQueueConsumer = (queue: Queue, channel: amqp.Channel) => {
                     } = mergeRequestSchema.parse(message);
 
                     await processMergeRequestAction(id, author_id, message, action);
-                    if (action === 'merge' || action === 'close') {
-                        await emitQueue();
-                    }
                     await emitAllMergeRequests();
+                    await emitQueue();
                     channel.ack(msg);
                 } catch (err) {
                     console.error(`Could not consume ${queue} message.`, err);
