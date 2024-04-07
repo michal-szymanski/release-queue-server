@@ -19,10 +19,7 @@ export const emitMergeRequests = async () => {
 
 export const emitQueue = async () => {
     const results = await qetQueue();
-    io.emit(
-        'queue',
-        results.map((row) => row.json)
-    );
+    io.emit('queue', results);
 };
 
 io.on('connection', async (socket) => {

@@ -52,7 +52,7 @@ export const processMergeRequestAction = async (id: number, authorId: number, js
 
 export const qetQueue = async () => {
     return db
-        .select({ json: mergeRequestsTable.json })
+        .select({ id: queueTable.id, json: mergeRequestsTable.json })
         .from(queueTable)
         .innerJoin(mergeRequestsTable, eq(mergeRequestsTable.id, queueTable.mergeRequestId))
         .orderBy(queueTable.id);
