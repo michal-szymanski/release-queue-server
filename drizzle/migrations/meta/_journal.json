@@ -15,6 +15,20 @@
       "when": 1711880127363,
       "tag": "0001_certain_ink",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1712686621485,
+      "tag": "0002_serious_korg",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1712688336353,
+      "tag": "0003_motionless_mimic",
+      "breakpoints": true
     }
   ]
 }

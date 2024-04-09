@@ -1,4 +1,4 @@
-import { json, pgTable, serial } from 'drizzle-orm/pg-core';
+import { json, pgTable, serial, text } from 'drizzle-orm/pg-core';
 import { integer } from 'drizzle-orm/pg-core/columns/integer';
 import { relations } from 'drizzle-orm';
 
@@ -22,6 +22,15 @@ export const queueTable = pgTable('queue', {
         .references(() => mergeRequestsTable.id)
 });
 
-export const queueRelations = relations(queueTable, ({ many }) => ({
-    mergeRequests: many(mergeRequestsTable)
+export const queueRelations = relations(queueTable, ({ one }) => ({
+    mergeRequests: one(mergeRequestsTable, {
+        fields: [queueTable.mergeRequestId],
+        references: [mergeRequestsTable.id]
+    })
 }));
+
+export const pipelinesTable = pgTable('pipelines', {
+    id: integer('id').primaryKey(),
+    commitId: text('commit_id').notNull(),
+    json: json('json').notNull()
+});

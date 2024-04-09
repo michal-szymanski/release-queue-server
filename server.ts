@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { initRabbitMQ, sendToQueue } from '@/rabbitmq';
 import { app, server } from '@/express';
-import { gitlabEventHeader } from '@/types';
+import { gitlabEventEnum } from '@/types';
 
 dotenv.config();
 
@@ -9,10 +9,12 @@ initRabbitMQ();
 
 app.post('/webhook', async (req, res) => {
     try {
-        const gitlabEventType = gitlabEventHeader.parse(req.header('X-Gitlab-Event'));
+        const gitlabEventType = gitlabEventEnum.parse(req.header('X-Gitlab-Event'));
+
         switch (gitlabEventType) {
             case 'Merge Request Hook':
-                await sendToQueue('merge-requests', req.body);
+            case 'Pipeline Hook':
+                await sendToQueue(gitlabEventType, req.body);
                 res.status(200).end();
                 break;
             default:

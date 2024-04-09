@@ -1,0 +1,1 @@
+ALTER TABLE "pipelines" ALTER COLUMN "commit_id" SET DATA TYPE text;

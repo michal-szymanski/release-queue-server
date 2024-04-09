@@ -1,12 +1,14 @@
 import { Server } from 'socket.io';
 import { server } from '@/express';
-import { addToQueue, getMergeRequests, qetQueue, removeFromQueue } from '@/drizzle/queries';
+import { getMergeRequests } from '@/drizzle/queries/merge-requests';
+import { addToQueue, qetQueue, removeFromQueue } from '@/drizzle/queries/queue';
 import { z } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
 import { jwtSchema, User } from '@/types';
 import cookieParser from 'cookie-parser';
 import { decode } from 'next-auth/jwt';
 import { IncomingMessage } from 'http';
+import { getPipelines } from '@/drizzle/queries/pipelines';
 
 const io = new Server(server, {
     cors: {
@@ -61,6 +63,11 @@ export const emitMergeRequests = async (userId: number) => {
 export const emitQueue = async () => {
     const results = await qetQueue();
     io.emit('queue', results);
+};
+
+export const emitPipelines = async () => {
+    const results = await getPipelines();
+    io.emit('pipelines', results);
 };
 
 io.on('connection', async (socket) => {

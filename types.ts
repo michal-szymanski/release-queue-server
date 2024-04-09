@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const gitlabEventHeader = z.enum([
+export const gitlabEventEnum = z.enum([
     'Push Hook',
     'Tag Push Hook',
     'Issue Hook',
@@ -18,15 +18,17 @@ export const gitlabEventHeader = z.enum([
     'Subgroup Hook'
 ]);
 
-const mergeRequestAction = z.enum(['open', 'close', 'reopen', 'update', 'approved', 'unapproved', 'approval', 'merge']);
+export type GitLabEvent = z.infer<typeof gitlabEventEnum>;
 
-export type MergeRequestAction = z.infer<typeof mergeRequestAction>;
+const mergeRequestActionEnum = z.enum(['open', 'close', 'reopen', 'update', 'approved', 'unapproved', 'approval', 'merge']);
+
+export type MergeRequestAction = z.infer<typeof mergeRequestActionEnum>;
 
 export const mergeRequestSchema = z.object({
     object_attributes: z.object({
         id: z.number(),
         author_id: z.number(),
-        action: mergeRequestAction.optional()
+        action: mergeRequestActionEnum.optional()
     })
 });
 
@@ -43,3 +45,12 @@ export const jwtSchema = z.object({
 export type User = {
     id: number;
 };
+
+export const pipelineSchema = z.object({
+    object_attributes: z.object({
+        id: z.number()
+    }),
+    commit: z.object({
+        id: z.string()
+    })
+});
