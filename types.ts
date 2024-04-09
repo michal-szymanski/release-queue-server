@@ -29,3 +29,17 @@ export const mergeRequestSchema = z.object({
         action: mergeRequestAction.optional()
     })
 });
+
+export const jwtSchema = z.object({
+    name: z.string(),
+    email: z.string(),
+    picture: z.string(),
+    sub: z.string(),
+    iat: z.number(),
+    exp: z.number(),
+    jti: z.string()
+});
+
+export type User = {
+    id: number;
+};
