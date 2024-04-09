@@ -67,7 +67,10 @@ export const emitQueue = async () => {
 
 export const emitPipelines = async () => {
     const results = await getPipelines();
-    io.emit('pipelines', results);
+    io.emit(
+        'pipelines',
+        results.map((row) => row.json)
+    );
 };
 
 io.on('connection', async (socket) => {
@@ -82,6 +85,7 @@ io.on('connection', async (socket) => {
 
     await emitQueue();
     await emitMergeRequests(user.id);
+    await emitPipelines();
 
     socket.on('add-to-queue', async (payload) => {
         const mergeRequestId = z.number().parse(payload);

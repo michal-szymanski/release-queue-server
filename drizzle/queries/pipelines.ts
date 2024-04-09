@@ -3,7 +3,7 @@ import { pipelinesTable } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 
 export const getPipelines = async () => {
-    return db.select().from(pipelinesTable);
+    return db.select({ json: pipelinesTable.json }).from(pipelinesTable);
 };
 
 export const addPipeline = async (id: number, commitId: string, json: unknown) => {
