@@ -28,7 +28,10 @@ export const mergeRequestSchema = z.object({
     object_attributes: z.object({
         id: z.number(),
         author_id: z.number(),
-        action: mergeRequestActionEnum.optional()
+        action: mergeRequestActionEnum.optional(),
+        last_commit: z.object({
+            id: z.string()
+        })
     })
 });
 
@@ -53,4 +56,9 @@ export const pipelineSchema = z.object({
     commit: z.object({
         id: z.string()
     })
+});
+
+export const jobSchema = z.object({
+    build_id: z.number(),
+    pipeline_id: z.number()
 });

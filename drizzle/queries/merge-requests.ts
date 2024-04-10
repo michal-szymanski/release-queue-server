@@ -2,7 +2,7 @@ import { db } from '@/drizzle/db';
 import { mergeRequestsTable, queueTable } from '@/drizzle/schema';
 import { and, eq, isNull } from 'drizzle-orm';
 
-export const getMergeRequests = async (userId: number) => {
+export const getMergeRequestsByUserId = async (userId: number) => {
     return db
         .select({ json: mergeRequestsTable.json })
         .from(mergeRequestsTable)
@@ -10,16 +10,16 @@ export const getMergeRequests = async (userId: number) => {
         .where(and(isNull(queueTable.mergeRequestId), eq(mergeRequestsTable.authorId, userId)));
 };
 
-export const addMergeRequest = async (id: number, authorId: number, json: unknown) => {
-    await db.insert(mergeRequestsTable).values({ id, authorId, json });
+export const addMergeRequest = async (id: number, authorId: number, commitId: string, json: unknown) => {
+    await db.insert(mergeRequestsTable).values({ id, authorId, commitId, json });
 };
 
 export const deleteMergeRequest = async (id: number) => {
     await db.delete(mergeRequestsTable).where(eq(mergeRequestsTable.id, id));
 };
 
-export const updateMergeRequest = async (id: number, json: unknown) => {
-    await db.update(mergeRequestsTable).set({ json }).where(eq(mergeRequestsTable.id, id));
+export const updateMergeRequest = async (id: number, authorId: number, commitId: string, json: unknown) => {
+    await db.update(mergeRequestsTable).set({ authorId, commitId, json }).where(eq(mergeRequestsTable.id, id));
 };
 
 export const isMergeRequestInDb = async (id: number) => {

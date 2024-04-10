@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
 import { server } from '@/express';
-import { getMergeRequests } from '@/drizzle/queries/merge-requests';
+import { getMergeRequestsByUserId } from '@/drizzle/queries/merge-requests';
 import { addToQueue, qetQueue, removeFromQueue } from '@/drizzle/queries/queue';
 import { z } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import { decode } from 'next-auth/jwt';
 import { IncomingMessage } from 'http';
 import { getPipelines } from '@/drizzle/queries/pipelines';
+import { getJobs } from '@/drizzle/queries/jobs';
 
 const io = new Server(server, {
     cors: {
@@ -53,7 +54,7 @@ io.engine.use(async (req: Request & { _query: Record<string, string>; user?: Use
 });
 
 export const emitMergeRequests = async (userId: number) => {
-    const results = await getMergeRequests(userId);
+    const results = await getMergeRequestsByUserId(userId);
     io.to(`user:${userId}`).emit(
         'merge-requests',
         results.map((row) => row.json)
@@ -73,6 +74,14 @@ export const emitPipelines = async () => {
     );
 };
 
+export const emitJobs = async () => {
+    const results = await getJobs();
+    io.emit(
+        'jobs',
+        results.map((row) => row.json)
+    );
+};
+
 io.on('connection', async (socket) => {
     const { user } = socket.request as IncomingMessage & { user?: User };
 
@@ -86,6 +95,7 @@ io.on('connection', async (socket) => {
     await emitQueue();
     await emitMergeRequests(user.id);
     await emitPipelines();
+    await emitJobs();
 
     socket.on('add-to-queue', async (payload) => {
         const mergeRequestId = z.number().parse(payload);

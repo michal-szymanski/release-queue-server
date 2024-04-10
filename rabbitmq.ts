@@ -1,9 +1,9 @@
 import amqp from 'amqplib';
-import { emitMergeRequests, emitPipelines, emitQueue } from '@/websocket';
-import { processMergeRequestInDb, processPipelineInDb } from '@/drizzle/services';
-import { GitLabEvent, mergeRequestSchema, pipelineSchema } from '@/types';
+import { emitJobs, emitMergeRequests, emitPipelines, emitQueue } from '@/websocket';
+import { processJobInDb, processMergeRequestInDb, processPipelineInDb } from '@/drizzle/services';
+import { GitLabEvent, jobSchema, mergeRequestSchema, pipelineSchema } from '@/types';
 
-const queues: GitLabEvent[] = ['Merge Request Hook', 'Pipeline Hook'];
+const queues: GitLabEvent[] = ['Merge Request Hook', 'Pipeline Hook', 'Job Hook'];
 const healthCheckInterval = 5000;
 
 const getConnection = async () => await amqp.connect(process.env.RABBIT_MQ_URL ?? '');
@@ -54,12 +54,19 @@ const createQueueConsumer = (queue: GitLabEvent, channel: amqp.Channel) => {
                     const message = JSON.parse(msg.content.toString());
 
                     const {
-                        object_attributes: { id, author_id, action }
+                        object_attributes: {
+                            id,
+                            author_id,
+                            action,
+                            last_commit: { id: commitId }
+                        }
                     } = mergeRequestSchema.parse(message);
 
-                    await processMergeRequestInDb(id, author_id, message, action);
+                    await processMergeRequestInDb(id, author_id, message, commitId, action);
                     await emitQueue();
                     await emitMergeRequests(author_id);
+                    await emitPipelines();
+
                     channel.ack(msg);
                 } catch (err) {
                     console.error(`Could not consume ${queue} message.`, err);
@@ -83,6 +90,28 @@ const createQueueConsumer = (queue: GitLabEvent, channel: amqp.Channel) => {
 
                     await processPipelineInDb(id, commitId, message);
                     await emitPipelines();
+
+                    channel.ack(msg);
+                } catch (err) {
+                    console.error(`Could not consume ${queue} message.`, err);
+                }
+            });
+            break;
+        case 'Job Hook':
+            channel.consume(queue, async (msg) => {
+                if (!msg) {
+                    console.log(`Consumer ${queue} cancelled by server.`);
+                    return;
+                }
+
+                try {
+                    const message = JSON.parse(msg.content.toString());
+
+                    const { build_id, pipeline_id } = jobSchema.parse(message);
+
+                    await processJobInDb(build_id, pipeline_id, message);
+                    await emitJobs();
+
                     channel.ack(msg);
                 } catch (err) {
                     console.error(`Could not consume ${queue} message.`, err);

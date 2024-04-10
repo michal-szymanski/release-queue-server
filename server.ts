@@ -14,6 +14,7 @@ app.post('/webhook', async (req, res) => {
         switch (gitlabEventType) {
             case 'Merge Request Hook':
             case 'Pipeline Hook':
+            case 'Job Hook':
                 await sendToQueue(gitlabEventType, req.body);
                 res.status(200).end();
                 break;

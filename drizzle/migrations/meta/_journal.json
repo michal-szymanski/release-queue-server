@@ -29,6 +29,27 @@
       "when": 1712688336353,
       "tag": "0003_motionless_mimic",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1712756507326,
+      "tag": "0004_real_white_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1712766358617,
+      "tag": "0005_bent_winter_soldier",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1712767561250,
+      "tag": "0006_easy_lockheed",
+      "breakpoints": true
     }
   ]
 }
