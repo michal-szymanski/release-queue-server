@@ -4,13 +4,19 @@ import { addMergeRequest, deleteMergeRequest, isMergeRequestInDb, updateMergeReq
 import { addPipeline, deletePipelineByMergeRequestId, isPipelineInDb, updatePipeline } from '@/drizzle/queries/pipelines';
 import { addJob, deleteJobsByMergeRequestId, isJobInDb, updateJob } from '@/drizzle/queries/jobs';
 
-export const processMergeRequestInDb = async (id: number, authorId: number, json: unknown, commitId: string, action?: MergeRequestAction) => {
+export const processMergeRequestInDb = async (
+    id: number,
+    authorId: number,
+    json: unknown,
+    commitId: string,
+    mergeCommitSHA: string | null,
+    action?: MergeRequestAction
+) => {
     switch (action) {
         case 'open':
         case 'reopen':
             await addMergeRequest(id, authorId, commitId, json);
             break;
-        case 'merge':
         case 'close':
             await deleteJobsByMergeRequestId(id);
             await deletePipelineByMergeRequestId(id);
@@ -23,7 +29,7 @@ export const processMergeRequestInDb = async (id: number, authorId: number, json
             const exists = await isMergeRequestInDb(id);
 
             if (exists) {
-                await updateMergeRequest(id, authorId, commitId, json);
+                await updateMergeRequest(id, authorId, commitId, mergeCommitSHA, json);
                 break;
             }
 

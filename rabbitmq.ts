@@ -58,11 +58,12 @@ const createQueueConsumer = (queue: GitLabEvent, channel: amqp.Channel) => {
                             id,
                             author_id,
                             action,
-                            last_commit: { id: commitId }
+                            last_commit: { id: commitId },
+                            merge_commit_sha
                         }
                     } = mergeRequestSchema.parse(message);
 
-                    await processMergeRequestInDb(id, author_id, message, commitId, action);
+                    await processMergeRequestInDb(id, author_id, message, commitId, merge_commit_sha, action);
                     await emitQueue();
                     await emitMergeRequests(author_id);
                     await emitPipelines();

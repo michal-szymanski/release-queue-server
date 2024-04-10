@@ -31,7 +31,8 @@ export const mergeRequestSchema = z.object({
         action: mergeRequestActionEnum.optional(),
         last_commit: z.object({
             id: z.string()
-        })
+        }),
+        merge_commit_sha: z.string().nullable()
     })
 });
 
