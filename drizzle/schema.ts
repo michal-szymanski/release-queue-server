@@ -1,4 +1,4 @@
-import { json, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { date, json, pgTable, serial, text } from 'drizzle-orm/pg-core';
 import { integer } from 'drizzle-orm/pg-core/columns/integer';
 import { relations } from 'drizzle-orm';
 
@@ -13,7 +13,9 @@ export const queueTable = pgTable('queue', {
     id: serial('id').primaryKey(),
     mergeRequestId: integer('merge_request_id')
         .notNull()
-        .references(() => mergeRequestsTable.id)
+        .references(() => mergeRequestsTable.id),
+    date: date('date', { mode: 'date' }).notNull(),
+    order: integer('order').notNull()
 });
 
 export const pipelinesTable = pgTable('pipelines', {
@@ -41,14 +43,3 @@ export const queueRelations = relations(queueTable, ({ one }) => ({
         references: [mergeRequestsTable.id]
     })
 }));
-
-// export const pipelinesRelations = relations(pipelinesTable, ({ many }) => ({
-//     jobs: many(jobsTable)
-// }));
-//
-// export const jobsRelations = relations(jobsTable, ({ one }) => ({
-//     pipeline: one(pipelinesTable, {
-//         fields: [jobsTable.pipelineId],
-//         references: [pipelinesTable.id]
-//     })
-// }));

@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import { server } from '@/express';
 import { getMergeRequestsByUserId } from '@/drizzle/queries/merge-requests';
-import { addToQueue, qetQueue, removeFromQueue } from '@/drizzle/queries/queue';
+import { addToQueue, qetQueue, removeFromQueue, stepBackInQueue } from '@/drizzle/queries/queue';
 import { z } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
 import { jwtSchema, User } from '@/types';
@@ -98,8 +98,14 @@ io.on('connection', async (socket) => {
     await emitJobs();
 
     socket.on('add-to-queue', async (payload) => {
-        const mergeRequestId = z.number().parse(payload);
-        await addToQueue(mergeRequestId);
+        const { mergeRequestId, isoString } = z
+            .object({
+                mergeRequestId: z.number(),
+                isoString: z.string().datetime()
+            })
+            .parse(payload);
+
+        await addToQueue(mergeRequestId, new Date(isoString));
         await emitQueue();
         await emitMergeRequests(user.id);
     });
@@ -109,5 +115,11 @@ io.on('connection', async (socket) => {
         await removeFromQueue(mergeRequestId);
         await emitQueue();
         await emitMergeRequests(user.id);
+    });
+
+    socket.on('step-back-in-queue', async (payload) => {
+        const mergeRequestId = z.number().parse(payload);
+        await stepBackInQueue(mergeRequestId);
+        await emitQueue();
     });
 });
