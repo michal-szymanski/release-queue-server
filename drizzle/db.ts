@@ -12,4 +12,6 @@ const pool = new Pool({
     ssl: false
 });
 
-export const db = drizzle(pool);
+const db = drizzle(pool);
+
+export { pool, db };

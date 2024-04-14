@@ -4,7 +4,7 @@ import { and, eq, max, not, sql } from 'drizzle-orm';
 
 export const qetQueue = async () => {
     return db
-        .select({ id: queueTable.id, json: mergeRequestsTable.json })
+        .select({ id: queueTable.id, json: mergeRequestsTable.json, date: queueTable.date })
         .from(queueTable)
         .innerJoin(mergeRequestsTable, eq(mergeRequestsTable.id, queueTable.mergeRequestId))
         .orderBy(queueTable.date, queueTable.order);
