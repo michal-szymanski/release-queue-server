@@ -1,6 +1,6 @@
-import { MergeRequestAction } from '@/types';
+import { MergeRequestAction, mergeRequestSchema } from '@/types';
 import { removeFromQueue } from '@/drizzle/queries/queue';
-import { addMergeRequest, deleteMergeRequest, isMergeRequestInDb, updateMergeRequest } from '@/drizzle/queries/merge-requests';
+import { addMergeRequest, deleteMergeRequest, getMergeRequestById, isMergeRequestInDb, updateMergeRequest } from '@/drizzle/queries/merge-requests';
 import { addPipeline, deletePipelineByMergeRequestId, isPipelineInDb, updatePipeline } from '@/drizzle/queries/pipelines';
 import { addJob, deleteJobsByMergeRequestId, isJobInDb, updateJob } from '@/drizzle/queries/jobs';
 
@@ -58,4 +58,20 @@ export const processJobInDb = async (id: number, pipelineId: number, json: unkno
     }
 
     await addJob(id, pipelineId, json);
+};
+
+export const processRemoveFromQueue = async (mergeRequestId: number) => {
+    const mergeRequestResults = await getMergeRequestById(mergeRequestId);
+    if (!mergeRequestResults.length) return;
+
+    await removeFromQueue(mergeRequestId);
+    const {
+        object_attributes: { action }
+    } = mergeRequestSchema.parse(mergeRequestResults[0].json);
+
+    if (action === 'merge') {
+        await deleteJobsByMergeRequestId(mergeRequestId);
+        await deletePipelineByMergeRequestId(mergeRequestId);
+        await deleteMergeRequest(mergeRequestId);
+    }
 };

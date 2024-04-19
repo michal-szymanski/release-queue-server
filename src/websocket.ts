@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import { server } from '@/express';
 import { getMergeRequestsByUserId } from '@/drizzle/queries/merge-requests';
-import { addToQueue, qetQueue, removeFromQueue, stepBackInQueue } from '@/drizzle/queries/queue';
+import { addToQueue, qetQueue, stepBackInQueue } from '@/drizzle/queries/queue';
 import { z } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
 import { jwtSchema, User } from '@/types';
@@ -11,6 +11,7 @@ import { IncomingMessage } from 'http';
 import { getPipelines } from '@/drizzle/queries/pipelines';
 import { getJobs } from '@/drizzle/queries/jobs';
 import { env } from '@/env';
+import { processRemoveFromQueue } from '@/drizzle/services';
 
 const io = new Server(server, {
     cors: {
@@ -113,7 +114,7 @@ io.on('connection', async (socket) => {
 
     socket.on('remove-from-queue', async (payload) => {
         const mergeRequestId = z.number().parse(payload);
-        await removeFromQueue(mergeRequestId);
+        await processRemoveFromQueue(mergeRequestId);
         await emitQueue();
         await emitMergeRequests(user.id);
     });

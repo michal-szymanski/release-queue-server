@@ -10,6 +10,10 @@ export const getMergeRequestsByUserId = async (userId: number) => {
         .where(and(isNull(queueTable.mergeRequestId), eq(mergeRequestsTable.authorId, userId)));
 };
 
+export const getMergeRequestById = async (id: number) => {
+    return db.select({ json: mergeRequestsTable.json }).from(mergeRequestsTable).where(eq(mergeRequestsTable.id, id));
+};
+
 export const addMergeRequest = async (id: number, authorId: number, commitId: string, json: unknown) => {
     await db.insert(mergeRequestsTable).values({ id, authorId, commitId, json });
 };
