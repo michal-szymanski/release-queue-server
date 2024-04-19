@@ -105,12 +105,7 @@ io.on('connection', async (socket) => {
             })
             .parse(payload);
 
-        const date = new Date(isoString);
-        date.setHours(0);
-        date.setMinutes(0);
-        date.setMilliseconds(0);
-
-        await addToQueue(mergeRequestId, date);
+        await addToQueue(mergeRequestId, new Date(isoString));
         await emitQueue();
         await emitMergeRequests(user.id);
     });
