@@ -10,10 +10,11 @@ import { decode } from 'next-auth/jwt';
 import { IncomingMessage } from 'http';
 import { getPipelines } from '@/drizzle/queries/pipelines';
 import { getJobs } from '@/drizzle/queries/jobs';
+import { env } from '@/env';
 
 const io = new Server(server, {
     cors: {
-        origin: process.env.WEB_APP_URL,
+        origin: env.WEB_APP_URL,
         credentials: true
     }
 });
@@ -34,7 +35,7 @@ io.engine.use(async (req: Request & { _query: Record<string, string>; user?: Use
 
         const jwt = await decode({
             token,
-            secret: `${process.env.NEXTAUTH_SECRET}`
+            secret: env.NEXTAUTH_SECRET
         });
 
         const { exp, sub } = jwtSchema.parse(jwt);

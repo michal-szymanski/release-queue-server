@@ -1,9 +1,7 @@
-import dotenv from 'dotenv';
 import { initRabbitMQ, sendToQueue } from '@/rabbitmq';
 import { app, server } from '@/express';
 import { gitlabEventEnum } from '@/types';
-
-dotenv.config();
+import { env } from '@/env';
 
 initRabbitMQ();
 
@@ -27,8 +25,6 @@ app.post('/webhook', async (req, res) => {
     }
 });
 
-const port = process.env.PORT;
-
-server.listen(port, () => {
-    console.log(`Server running on port ${port}.`);
+server.listen(env.PORT, () => {
+    console.log(`Server running on port ${env.PORT}.`);
 });

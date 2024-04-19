@@ -2,11 +2,12 @@ import amqp from 'amqplib';
 import { emitJobs, emitMergeRequests, emitPipelines, emitQueue } from '@/websocket';
 import { processJobInDb, processMergeRequestInDb, processPipelineInDb } from '@/drizzle/services';
 import { GitLabEvent, jobSchema, mergeRequestSchema, pipelineSchema } from '@/types';
+import { env } from '@/env';
 
 const queues: GitLabEvent[] = ['Merge Request Hook', 'Pipeline Hook', 'Job Hook'];
 const healthCheckInterval = 5000;
 
-const getConnection = async () => await amqp.connect(process.env.RABBIT_MQ_URL ?? '');
+const getConnection = async () => await amqp.connect(env.RABBIT_MQ_URL);
 
 const createQueues = async (channel: amqp.Channel) => {
     try {

@@ -1,13 +1,12 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import dotenv from 'dotenv';
-dotenv.config();
+import { env } from '@/env';
 
 const pool = new Pool({
     host: 'postgres',
     port: 5432,
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
+    user: env.POSTGRES_USER,
+    password: env.POSTGRES_PASSWORD,
     database: 'release-queue',
     ssl: false
 });

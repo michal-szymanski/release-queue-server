@@ -8,5 +8,6 @@ COPY package.json pnpm-lock.yaml .env tsconfig.json drizzle.config.ts ./
 COPY src/ src/
 
 RUN pnpm install
+RUN pnpm env:check
 
 CMD ["pnpm", "start"]
