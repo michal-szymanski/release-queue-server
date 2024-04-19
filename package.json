@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "start": "pnpm db:migrate && tsx server.ts",
+        "start": "pnpm db:migrate && tsx src/server.ts",
         "format": "prettier . --write",
         "db:generate": "drizzle-kit generate:pg",
         "db:migrate": "tsx drizzle/migrate.ts",

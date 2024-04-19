@@ -20,7 +20,7 @@ const tryConnect = async () => {
 const tryMigrate = async (db: PostgresJsDatabase) => {
     try {
         console.log('Running migrations...');
-        await migrate(db, { migrationsFolder: 'drizzle/migrations' });
+        await migrate(db, { migrationsFolder: 'src/drizzle/migrations' });
         console.log('Migrations pushed successfully.');
         process.exit(0);
     } catch (err) {
