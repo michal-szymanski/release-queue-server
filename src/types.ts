@@ -26,13 +26,16 @@ export type MergeRequestAction = z.infer<typeof mergeRequestActionEnum>;
 
 export const mergeRequestSchema = z.object({
     object_attributes: z.object({
-        id: z.number(),
+        iid: z.number(),
         author_id: z.number(),
         action: mergeRequestActionEnum.optional(),
         last_commit: z.object({
             id: z.string()
         }),
         merge_commit_sha: z.string().nullable()
+    }),
+    project: z.object({
+        id: z.number()
     })
 });
 
@@ -52,7 +55,7 @@ export type User = {
 
 export const pipelineSchema = z.object({
     object_attributes: z.object({
-        id: z.number()
+        iid: z.number()
     }),
     commit: z.object({
         id: z.string()

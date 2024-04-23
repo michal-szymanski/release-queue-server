@@ -56,7 +56,7 @@ const createQueueConsumer = (queue: GitLabEvent, channel: amqp.Channel) => {
 
                     const {
                         object_attributes: {
-                            id,
+                            iid,
                             author_id,
                             action,
                             last_commit: { id: commitId },
@@ -64,7 +64,7 @@ const createQueueConsumer = (queue: GitLabEvent, channel: amqp.Channel) => {
                         }
                     } = mergeRequestSchema.parse(message);
 
-                    await processMergeRequestInDb(id, author_id, message, commitId, merge_commit_sha, action);
+                    await processMergeRequestInDb(iid, author_id, message, commitId, merge_commit_sha, action);
                     await emitQueue();
                     await emitMergeRequests(author_id);
                     await emitPipelines();
@@ -86,11 +86,11 @@ const createQueueConsumer = (queue: GitLabEvent, channel: amqp.Channel) => {
                     const message = JSON.parse(msg.content.toString());
 
                     const {
-                        object_attributes: { id },
+                        object_attributes: { iid },
                         commit: { id: commitId }
                     } = pipelineSchema.parse(message);
 
-                    await processPipelineInDb(id, commitId, message);
+                    await processPipelineInDb(iid, commitId, message);
                     await emitPipelines();
 
                     channel.ack(msg);

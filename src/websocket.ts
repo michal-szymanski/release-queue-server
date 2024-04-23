@@ -1,10 +1,10 @@
 import { Server } from 'socket.io';
 import { server } from '@/express';
-import { getMergeRequestsByUserId } from '@/drizzle/queries/merge-requests';
+import { addRebaseError, getMergeRequestById, getMergeRequestsByUserId } from '@/drizzle/queries/merge-requests';
 import { addToQueue, qetQueue, stepBackInQueue } from '@/drizzle/queries/queue';
 import { z } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
-import { jwtSchema, User } from '@/types';
+import { jwtSchema, mergeRequestSchema, User } from '@/types';
 import cookieParser from 'cookie-parser';
 import { decode } from 'next-auth/jwt';
 import { IncomingMessage } from 'http';
@@ -57,10 +57,7 @@ io.engine.use(async (req: Request & { _query: Record<string, string>; user?: Use
 
 export const emitMergeRequests = async (userId: number) => {
     const results = await getMergeRequestsByUserId(userId);
-    io.to(`user:${userId}`).emit(
-        'merge-requests',
-        results.map((row) => row.json)
-    );
+    io.to(`user:${userId}`).emit('merge-requests', results);
 };
 
 export const emitQueue = async () => {
@@ -100,21 +97,25 @@ io.on('connection', async (socket) => {
     await emitJobs();
 
     socket.on('add-to-queue', async (payload) => {
-        const { mergeRequestId, isoString } = z
+        const { mergeRequestIid, isoString } = z
             .object({
-                mergeRequestId: z.number(),
+                mergeRequestIid: z.number(),
                 isoString: z.string().datetime()
             })
             .parse(payload);
+        const mergeRequestResults = await getMergeRequestById(mergeRequestIid);
+        const {
+            project: { id: repositoryId }
+        } = mergeRequestSchema.parse(mergeRequestResults[0].json);
 
-        await addToQueue(mergeRequestId, new Date(isoString));
+        await addToQueue(mergeRequestIid, repositoryId, new Date(isoString));
         await emitQueue();
         await emitMergeRequests(user.id);
     });
 
     socket.on('remove-from-queue', async (payload) => {
-        const mergeRequestId = z.number().parse(payload);
-        await processRemoveFromQueue(mergeRequestId);
+        const mergeRequestIid = z.number().parse(payload);
+        await processRemoveFromQueue(mergeRequestIid);
         await emitQueue();
         await emitMergeRequests(user.id);
     });
@@ -123,5 +124,12 @@ io.on('connection', async (socket) => {
         const mergeRequestId = z.number().parse(payload);
         await stepBackInQueue(mergeRequestId);
         await emitQueue();
+    });
+
+    socket.on('add-rebase-error', async (payload) => {
+        const { mergeRequestIid, rebaseError } = z.object({ mergeRequestIid: z.number(), rebaseError: z.string() }).parse(payload);
+        await addRebaseError(mergeRequestIid, rebaseError);
+        await emitQueue();
+        await emitMergeRequests(user.id);
     });
 });

@@ -4,7 +4,13 @@ import { and, eq, max, not, sql } from 'drizzle-orm';
 
 export const qetQueue = async () => {
     return db
-        .select({ id: queueTable.id, json: mergeRequestsTable.json, date: queueTable.date })
+        .select({
+            id: queueTable.id,
+            json: mergeRequestsTable.json,
+            date: queueTable.date,
+            order: queueTable.order,
+            rebaseError: mergeRequestsTable.rebaseError
+        })
         .from(queueTable)
         .innerJoin(mergeRequestsTable, eq(mergeRequestsTable.id, queueTable.mergeRequestId))
         .orderBy(queueTable.date, queueTable.order);
@@ -17,11 +23,12 @@ const selectMaxOrderByDate = db
     .groupBy(queueTable.date)
     .prepare('select_max_order_by_date');
 
-export const addToQueue = async (mergeRequestId: number, date: Date) => {
+export const addToQueue = async (mergeRequestId: number, repositoryId: number, date: Date) => {
     const orderResults = await selectMaxOrderByDate.execute({ date });
 
     await db.insert(queueTable).values({
         mergeRequestId,
+        repositoryId,
         date,
         order: (orderResults[0]?.lastOrder ?? -1) + 1
     });

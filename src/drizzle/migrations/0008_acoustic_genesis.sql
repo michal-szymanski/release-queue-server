@@ -1,0 +1,1 @@
+ALTER TABLE "queue" ADD COLUMN "repository_id" integer NOT NULL;

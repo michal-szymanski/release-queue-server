@@ -6,7 +6,8 @@ export const mergeRequestsTable = pgTable('merge_requests', {
     id: integer('id').primaryKey(),
     authorId: integer('author_id').notNull(),
     commitId: text('commit_id').notNull(),
-    json: json('json').notNull()
+    json: json('json').notNull(),
+    rebaseError: text('rebase_error')
 });
 
 export const queueTable = pgTable('queue', {
@@ -15,7 +16,8 @@ export const queueTable = pgTable('queue', {
         .notNull()
         .references(() => mergeRequestsTable.id),
     date: date('date', { mode: 'date' }).notNull(),
-    order: integer('order').notNull()
+    order: integer('order').notNull(),
+    repositoryId: integer('repository_id').notNull()
 });
 
 export const pipelinesTable = pgTable('pipelines', {
