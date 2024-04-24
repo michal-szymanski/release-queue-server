@@ -1,4 +1,4 @@
 package.json
 pnpm-lock.yaml
-drizzle/migrations
+src/drizzle/migrations
 .env
