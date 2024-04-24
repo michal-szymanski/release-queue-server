@@ -8,8 +8,7 @@ export const qetQueue = async () => {
             id: queueTable.id,
             json: mergeRequestsTable.json,
             date: queueTable.date,
-            order: queueTable.order,
-            rebaseError: mergeRequestsTable.rebaseError
+            order: queueTable.order
         })
         .from(queueTable)
         .innerJoin(mergeRequestsTable, eq(mergeRequestsTable.id, queueTable.mergeRequestId))

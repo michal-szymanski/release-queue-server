@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
 import { server } from '@/express';
-import { addRebaseError, getMergeRequestById, getMergeRequestsByUserId } from '@/drizzle/queries/merge-requests';
+import { getMergeRequestById, getMergeRequestsByUserId } from '@/drizzle/queries/merge-requests';
 import { addToQueue, qetQueue, stepBackInQueue } from '@/drizzle/queries/queue';
 import { z } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
@@ -57,7 +57,10 @@ io.engine.use(async (req: Request & { _query: Record<string, string>; user?: Use
 
 export const emitMergeRequests = async (userId: number) => {
     const results = await getMergeRequestsByUserId(userId);
-    io.to(`user:${userId}`).emit('merge-requests', results);
+    io.to(`user:${userId}`).emit(
+        'merge-requests',
+        results.map((row) => row.json)
+    );
 };
 
 export const emitQueue = async () => {
@@ -124,12 +127,5 @@ io.on('connection', async (socket) => {
         const mergeRequestId = z.number().parse(payload);
         await stepBackInQueue(mergeRequestId);
         await emitQueue();
-    });
-
-    socket.on('add-rebase-error', async (payload) => {
-        const { mergeRequestIid, rebaseError } = z.object({ mergeRequestIid: z.number(), rebaseError: z.string() }).parse(payload);
-        await addRebaseError(mergeRequestIid, rebaseError);
-        await emitQueue();
-        await emitMergeRequests(user.id);
     });
 });

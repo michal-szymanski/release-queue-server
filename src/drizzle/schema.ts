@@ -6,8 +6,7 @@ export const mergeRequestsTable = pgTable('merge_requests', {
     id: integer('id').primaryKey(),
     authorId: integer('author_id').notNull(),
     commitId: text('commit_id').notNull(),
-    json: json('json').notNull(),
-    rebaseError: text('rebase_error')
+    json: json('json').notNull()
 });
 
 export const queueTable = pgTable('queue', {
