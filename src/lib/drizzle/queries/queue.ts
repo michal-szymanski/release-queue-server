@@ -1,5 +1,5 @@
-import { db } from '@/drizzle/db';
-import { mergeRequestsTable, queueTable } from '@/drizzle/schema';
+import { db } from '@/lib/drizzle/db';
+import { mergeRequestsTable, queueTable } from '@/lib/drizzle/schema';
 import { and, eq, max, not, sql } from 'drizzle-orm';
 
 export const qetQueue = async () => {

@@ -1,5 +1,5 @@
-import { db } from '@/drizzle/db';
-import { jobsTable, mergeRequestsTable, pipelinesTable } from '@/drizzle/schema';
+import { db } from '@/lib/drizzle/db';
+import { jobsTable, mergeRequestsTable, pipelinesTable } from '@/lib/drizzle/schema';
 import { eq } from 'drizzle-orm';
 
 export const getJobs = async () => {

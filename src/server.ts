@@ -1,5 +1,5 @@
-import { initRabbitMQ, sendToQueue } from '@/rabbitmq';
-import { app, server } from '@/express';
+import { initRabbitMQ, sendToQueue } from '@/lib/rabbitmq';
+import { app, server } from '@/lib/express';
 import { gitlabEventEnum } from '@/types';
 import { env } from '@/env';
 

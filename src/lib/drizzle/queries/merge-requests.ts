@@ -1,5 +1,5 @@
-import { db } from '@/drizzle/db';
-import { mergeRequestsTable, queueTable } from '@/drizzle/schema';
+import { db } from '@/lib/drizzle/db';
+import { mergeRequestsTable, queueTable } from '@/lib/drizzle/schema';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export const getMergeRequestsByUserId = async (userId: number) => {

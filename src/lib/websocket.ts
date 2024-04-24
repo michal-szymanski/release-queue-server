@@ -1,17 +1,17 @@
 import { Server } from 'socket.io';
-import { server } from '@/express';
-import { getMergeRequestById, getMergeRequestsByUserId } from '@/drizzle/queries/merge-requests';
-import { addToQueue, qetQueue, stepBackInQueue } from '@/drizzle/queries/queue';
+import { server } from '@/lib/express';
+import { getMergeRequestById, getMergeRequestsByUserId } from '@/lib/drizzle/queries/merge-requests';
+import { addToQueue, qetQueue, stepBackInQueue } from '@/lib/drizzle/queries/queue';
 import { z } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
 import { jwtSchema, mergeRequestSchema, User } from '@/types';
 import cookieParser from 'cookie-parser';
 import { decode } from 'next-auth/jwt';
 import { IncomingMessage } from 'http';
-import { getPipelines } from '@/drizzle/queries/pipelines';
-import { getJobs } from '@/drizzle/queries/jobs';
+import { getPipelines } from '@/lib/drizzle/queries/pipelines';
+import { getJobs } from '@/lib/drizzle/queries/jobs';
 import { env } from '@/env';
-import { processRemoveFromQueue } from '@/drizzle/services';
+import { processRemoveFromQueue } from '@/lib/drizzle/services';
 
 const io = new Server(server, {
     cors: {

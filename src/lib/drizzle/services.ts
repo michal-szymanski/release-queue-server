@@ -1,8 +1,8 @@
 import { MergeRequestAction, mergeRequestSchema } from '@/types';
-import { removeFromQueue } from '@/drizzle/queries/queue';
-import { addMergeRequest, deleteMergeRequest, getMergeRequestById, isMergeRequestInDb, updateMergeRequest } from '@/drizzle/queries/merge-requests';
-import { addPipeline, deletePipelineByMergeRequestId, isPipelineInDb, updatePipeline } from '@/drizzle/queries/pipelines';
-import { addJob, deleteJobsByMergeRequestId, isJobInDb, updateJob } from '@/drizzle/queries/jobs';
+import { removeFromQueue } from '@/lib/drizzle/queries/queue';
+import { addMergeRequest, deleteMergeRequest, getMergeRequestById, isMergeRequestInDb, updateMergeRequest } from '@/lib/drizzle/queries/merge-requests';
+import { addPipeline, deletePipelineByMergeRequestId, isPipelineInDb, updatePipeline } from '@/lib/drizzle/queries/pipelines';
+import { addJob, deleteJobsByMergeRequestId, isJobInDb, updateJob } from '@/lib/drizzle/queries/jobs';
 
 export const processMergeRequestInDb = async (
     id: number,

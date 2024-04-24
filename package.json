@@ -6,7 +6,7 @@
         "start": "pnpm db:migrate && tsx src/server.ts",
         "format": "prettier . --write",
         "db:generate": "drizzle-kit generate:pg",
-        "db:migrate": "tsx src/drizzle/migrate.ts",
+        "db:migrate": "tsx src/lib/drizzle/migrate.ts",
         "db:studio": "drizzle-kit studio",
         "env:check": "tsx src/env.ts",
         "tsc:check": "tsc",

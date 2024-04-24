@@ -1,5 +1,5 @@
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import { pool } from '@/drizzle/db';
+import { pool } from '@/lib/drizzle/db';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
@@ -20,7 +20,7 @@ const tryConnect = async () => {
 const tryMigrate = async (db: PostgresJsDatabase) => {
     try {
         console.log('Running migrations...');
-        await migrate(db, { migrationsFolder: 'src/drizzle/migrations' });
+        await migrate(db, { migrationsFolder: 'src/lib/drizzle/migrations' });
         console.log('Migrations pushed successfully.');
         process.exit(0);
     } catch (err) {
