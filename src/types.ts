@@ -35,7 +35,8 @@ export const mergeRequestSchema = z.object({
         merge_commit_sha: z.string().nullable()
     }),
     project: z.object({
-        id: z.number()
+        id: z.number(),
+        name: z.string()
     })
 });
 
@@ -55,7 +56,7 @@ export type User = {
 
 export const pipelineSchema = z.object({
     object_attributes: z.object({
-        iid: z.number()
+        id: z.number()
     }),
     commit: z.object({
         id: z.string()

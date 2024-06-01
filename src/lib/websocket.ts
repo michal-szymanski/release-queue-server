@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
 import { server } from '@/lib/express';
-import { getMergeRequestById, getMergeRequestsByUserId } from '@/lib/drizzle/queries/merge-requests';
+import { getMergeRequestById } from '@/lib/drizzle/queries/merge-requests';
 import { addToQueue, qetQueue, stepBackInQueue } from '@/lib/drizzle/queries/queue';
 import { z } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
@@ -8,10 +8,8 @@ import { jwtSchema, mergeRequestSchema, User } from '@/types';
 import cookieParser from 'cookie-parser';
 import { decode } from 'next-auth/jwt';
 import { IncomingMessage } from 'http';
-import { getPipelines } from '@/lib/drizzle/queries/pipelines';
-import { getJobs } from '@/lib/drizzle/queries/jobs';
 import { env } from '@/env';
-import { processRemoveFromQueue } from '@/lib/drizzle/services';
+import { getEventsByUserId, processRemoveFromQueue } from '@/lib/drizzle/services';
 
 const io = new Server(server, {
     cors: {
@@ -55,33 +53,26 @@ io.engine.use(async (req: Request & { _query: Record<string, string>; user?: Use
     }
 });
 
-export const emitMergeRequests = async (userId: number) => {
-    const results = await getMergeRequestsByUserId(userId);
-    io.to(`user:${userId}`).emit(
-        'merge-requests',
-        results.map((row) => row.json)
-    );
-};
-
 export const emitQueue = async () => {
     const results = await qetQueue();
     io.emit('queue', results);
 };
 
-export const emitPipelines = async () => {
-    const results = await getPipelines();
-    io.emit(
-        'pipelines',
-        results.map((row) => row.json)
-    );
+export const emitPipeline = async (message: unknown) => {
+    io.emit('pipeline', message);
 };
 
-export const emitJobs = async () => {
-    const results = await getJobs();
-    io.emit(
-        'jobs',
-        results.map((row) => row.json)
-    );
+export const emitJob = async (message: unknown) => {
+    io.emit('job', message);
+};
+
+export const emitMergeRequest = async (message: unknown) => {
+    io.emit('merge-request', message);
+};
+
+export const emitEvents = async (userId: number) => {
+    const events = await getEventsByUserId(userId);
+    io.emit('events', events);
 };
 
 io.on('connection', async (socket) => {
@@ -94,10 +85,8 @@ io.on('connection', async (socket) => {
 
     socket.join(`user:${user.id}`);
 
+    await emitEvents(user.id);
     await emitQueue();
-    await emitMergeRequests(user.id);
-    await emitPipelines();
-    await emitJobs();
 
     socket.on('add-to-queue', async (payload) => {
         const { mergeRequestIid, isoString } = z
@@ -113,19 +102,17 @@ io.on('connection', async (socket) => {
 
         await addToQueue(mergeRequestIid, repositoryId, new Date(isoString));
         await emitQueue();
-        await emitMergeRequests(user.id);
     });
 
     socket.on('remove-from-queue', async (payload) => {
         const mergeRequestIid = z.number().parse(payload);
         await processRemoveFromQueue(mergeRequestIid);
         await emitQueue();
-        await emitMergeRequests(user.id);
     });
 
     socket.on('step-back-in-queue', async (payload) => {
-        const mergeRequestId = z.number().parse(payload);
-        await stepBackInQueue(mergeRequestId);
+        const mergeRequestIid = z.number().parse(payload);
+        await stepBackInQueue(mergeRequestIid);
         await emitQueue();
     });
 });

@@ -1,6 +1,7 @@
 {
     "name": "release-queue-server",
     "version": "0.1.0",
+    "author": "Michał Szymański",
     "private": true,
     "scripts": {
         "start": "pnpm db:migrate && tsx src/server.ts",
@@ -20,7 +21,7 @@
         "amqplib": "^0.10.3",
         "cookie-parser": "^1.4.6",
         "dotenv": "^16.4.5",
-        "drizzle-kit": "^0.20.17",
+        "drizzle-kit": "^0.21.2",
         "drizzle-orm": "^0.30.6",
         "express": "^4.19.2",
         "next-auth": "^4.24.7",

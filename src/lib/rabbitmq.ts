@@ -1,5 +1,5 @@
 import amqp from 'amqplib';
-import { emitJobs, emitMergeRequests, emitPipelines, emitQueue } from '@/lib/websocket';
+import { emitQueue, emitPipeline, emitMergeRequest, emitJob } from '@/lib/websocket';
 import { processJobInDb, processMergeRequestInDb, processPipelineInDb } from '@/lib/drizzle/services';
 import { GitLabEvent, jobSchema, mergeRequestSchema, pipelineSchema } from '@/types';
 import { env } from '@/env';
@@ -61,13 +61,13 @@ const createQueueConsumer = (queue: GitLabEvent, channel: amqp.Channel) => {
                             action,
                             last_commit: { id: commitId },
                             merge_commit_sha
-                        }
+                        },
+                        project
                     } = mergeRequestSchema.parse(message);
 
                     await processMergeRequestInDb(iid, author_id, message, commitId, merge_commit_sha, action);
+                    await emitMergeRequest(message);
                     await emitQueue();
-                    await emitMergeRequests(author_id);
-                    await emitPipelines();
 
                     channel.ack(msg);
                 } catch (err) {
@@ -86,12 +86,12 @@ const createQueueConsumer = (queue: GitLabEvent, channel: amqp.Channel) => {
                     const message = JSON.parse(msg.content.toString());
 
                     const {
-                        object_attributes: { iid },
+                        object_attributes: { id },
                         commit: { id: commitId }
                     } = pipelineSchema.parse(message);
 
-                    await processPipelineInDb(iid, commitId, message);
-                    await emitPipelines();
+                    await processPipelineInDb(id, commitId, message);
+                    await emitPipeline(message);
 
                     channel.ack(msg);
                 } catch (err) {
@@ -112,7 +112,7 @@ const createQueueConsumer = (queue: GitLabEvent, channel: amqp.Channel) => {
                     const { build_id, pipeline_id } = jobSchema.parse(message);
 
                     await processJobInDb(build_id, pipeline_id, message);
-                    await emitJobs();
+                    await emitJob(message);
 
                     channel.ack(msg);
                 } catch (err) {

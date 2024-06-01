@@ -1,8 +1,11 @@
-import { MergeRequestAction, mergeRequestSchema } from '@/types';
+import { MergeRequestAction, mergeRequestSchema, pipelineSchema } from '@/types';
 import { removeFromQueue } from '@/lib/drizzle/queries/queue';
 import { addMergeRequest, deleteMergeRequest, getMergeRequestById, isMergeRequestInDb, updateMergeRequest } from '@/lib/drizzle/queries/merge-requests';
 import { addPipeline, deletePipelineByMergeRequestId, isPipelineInDb, updatePipeline } from '@/lib/drizzle/queries/pipelines';
 import { addJob, deleteJobsByMergeRequestId, isJobInDb, updateJob } from '@/lib/drizzle/queries/jobs';
+import { jobsTable, mergeRequestsTable, pipelinesTable, queueTable } from '@/lib/drizzle/schema';
+import { eq, isNotNull, or, sql } from 'drizzle-orm';
+import { db } from '@/lib/drizzle/db';
 
 export const processMergeRequestInDb = async (
     id: number,
@@ -74,4 +77,32 @@ export const processRemoveFromQueue = async (mergeRequestId: number) => {
         await deletePipelineByMergeRequestId(mergeRequestId);
         await deleteMergeRequest(mergeRequestId);
     }
+};
+
+export const getEventsByUserId = async (userId: number) => {
+    const results = await db
+        .select({
+            mergeRequest: mergeRequestsTable.json,
+            pipeline: pipelinesTable.json
+        })
+        .from(mergeRequestsTable)
+        .leftJoin(pipelinesTable, eq(pipelinesTable.commitId, mergeRequestsTable.commitId))
+        .leftJoin(queueTable, eq(queueTable.mergeRequestId, mergeRequestsTable.id))
+        .where(or(isNotNull(queueTable.mergeRequestId), eq(mergeRequestsTable.authorId, userId)));
+
+    const events: { mergeRequest: unknown; pipeline: unknown; jobs: unknown[] }[] = [];
+
+    for (const { mergeRequest, pipeline } of results) {
+        if (!pipeline) {
+            events.push({ mergeRequest, pipeline, jobs: [] });
+        } else {
+            const jobs = await db
+                .select({ json: jobsTable.json })
+                .from(jobsTable)
+                .where(eq(jobsTable.pipelineId, pipelineSchema.parse(pipeline).object_attributes.id));
+            events.push({ mergeRequest, pipeline, jobs: jobs.map((row) => row.json) });
+        }
+    }
+
+    return events;
 };

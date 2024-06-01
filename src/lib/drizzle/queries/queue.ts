@@ -6,7 +6,7 @@ export const qetQueue = async () => {
     return db
         .select({
             id: queueTable.id,
-            json: mergeRequestsTable.json,
+            mergeRequestIid: mergeRequestsTable.id,
             date: queueTable.date,
             order: queueTable.order
         })

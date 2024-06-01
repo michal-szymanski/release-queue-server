@@ -2,9 +2,9 @@ import { defineConfig } from 'drizzle-kit';
 import { env } from '@/env';
 
 export default defineConfig({
-    schema: './src/drizzle/schema.ts',
-    out: './src/drizzle/migrations',
-    driver: 'pg',
+    schema: './src/lib/drizzle/schema.ts',
+    out: './src/lib/drizzle/migrations',
+    dialect: 'postgresql',
     dbCredentials: {
         host: '0.0.0.0',
         port: 5432,
