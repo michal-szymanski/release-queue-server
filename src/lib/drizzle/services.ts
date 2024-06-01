@@ -7,14 +7,7 @@ import { jobsTable, mergeRequestsTable, pipelinesTable, queueTable } from '@/lib
 import { eq, isNotNull, or, sql } from 'drizzle-orm';
 import { db } from '@/lib/drizzle/db';
 
-export const processMergeRequestInDb = async (
-    id: number,
-    authorId: number,
-    json: unknown,
-    commitId: string,
-    mergeCommitSHA: string | null,
-    action?: MergeRequestAction
-) => {
+export const processMergeRequestInDb = async (id: number, authorId: number, json: unknown, commitId: string, action?: MergeRequestAction) => {
     switch (action) {
         case 'open':
         case 'reopen':
@@ -32,7 +25,7 @@ export const processMergeRequestInDb = async (
             const exists = await isMergeRequestInDb(id);
 
             if (exists) {
-                await updateMergeRequest(id, authorId, commitId, mergeCommitSHA, json);
+                await updateMergeRequest(id, authorId, commitId, json);
                 break;
             }
 

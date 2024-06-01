@@ -22,11 +22,8 @@ export const deleteMergeRequest = async (id: number) => {
     await db.delete(mergeRequestsTable).where(eq(mergeRequestsTable.id, id));
 };
 
-export const updateMergeRequest = async (id: number, authorId: number, commitId: string, mergeCommitSHA: string | null, json: unknown) => {
-    await db
-        .update(mergeRequestsTable)
-        .set({ authorId, commitId: mergeCommitSHA ?? commitId, json })
-        .where(eq(mergeRequestsTable.id, id));
+export const updateMergeRequest = async (id: number, authorId: number, commitId: string, json: unknown) => {
+    await db.update(mergeRequestsTable).set({ authorId, commitId, json }).where(eq(mergeRequestsTable.id, id));
 };
 
 export const isMergeRequestInDb = async (id: number) => {

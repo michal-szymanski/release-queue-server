@@ -1,5 +1,5 @@
 import amqp from 'amqplib';
-import { emitQueue, emitPipeline, emitMergeRequest, emitJob } from '@/lib/websocket';
+import { emitQueue, emitPipeline, emitMergeRequest, emitJob, emitRepositoryUpdate } from '@/lib/websocket';
 import { processJobInDb, processMergeRequestInDb, processPipelineInDb } from '@/lib/drizzle/services';
 import { GitLabEvent, jobSchema, mergeRequestSchema, pipelineSchema } from '@/types';
 import { env } from '@/env';
@@ -65,9 +65,13 @@ const createQueueConsumer = (queue: GitLabEvent, channel: amqp.Channel) => {
                         project
                     } = mergeRequestSchema.parse(message);
 
-                    await processMergeRequestInDb(iid, author_id, message, commitId, merge_commit_sha, action);
+                    await processMergeRequestInDb(iid, author_id, message, commitId, action);
                     await emitMergeRequest(message);
                     await emitQueue();
+
+                    if (action === 'merge') {
+                        await emitRepositoryUpdate(project.name);
+                    }
 
                     channel.ack(msg);
                 } catch (err) {

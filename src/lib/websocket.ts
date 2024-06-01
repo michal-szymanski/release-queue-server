@@ -75,6 +75,10 @@ export const emitEvents = async (userId: number) => {
     io.emit('events', events);
 };
 
+export const emitRepositoryUpdate = async (repositoryName: string) => {
+    io.emit('repository-update', repositoryName);
+};
+
 io.on('connection', async (socket) => {
     const { user } = socket.request as IncomingMessage & { user?: User };
 
