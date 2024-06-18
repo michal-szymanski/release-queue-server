@@ -1,14 +1,5 @@
 version: '3.8'
 services:
-    rabbitmq:
-        container_name: rabbitmq
-        image: rabbitmq:3-management
-        ports:
-            - '5672:5672'
-            - '15672:15672'
-        volumes:
-            - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-            - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     postgres:
         image: postgres:latest
         container_name: postgres
@@ -16,7 +7,7 @@ services:
             DB_USER: '${DB_USER}'
             DB_PASSWORD: '${DB_PASSWORD}'
             DB_HOST: '${DB_HOST}'
-            POSTGRES_DB: release-queue
+            POSTGRES_DB: '${DB_NAME}'
         ports:
             - '5432:5432'
         volumes:
@@ -29,5 +20,4 @@ services:
         env_file:
             - .env
         depends_on:
-            - rabbitmq
             - postgres
