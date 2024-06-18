@@ -23,6 +23,10 @@ app.post('/webhook', async (req, res) => {
     }
 });
 
+app.get('/health', async (_req, res) => {
+    res.status(200).send('OK');
+});
+
 server.listen(env.PORT, () => {
     console.log(`Server running on port ${env.PORT}.`);
 });
