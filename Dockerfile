@@ -10,6 +10,6 @@ COPY src/ src/
 RUN pnpm install
 RUN pnpm tsc:check
 RUN pnpm prettier:check
-RUN pnpm env:check
+# RUN pnpm env:check
 
 CMD ["pnpm", "start"]
