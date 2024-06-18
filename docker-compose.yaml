@@ -26,6 +26,8 @@ services:
         build: .
         ports:
             - '${PORT}:${PORT}'
+        env_file:
+            - .env
         depends_on:
             - rabbitmq
             - postgres
