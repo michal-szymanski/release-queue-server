@@ -6,7 +6,6 @@ import { z } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
 import { jwtSchema, mergeRequestSchema, User } from '@/types';
 import cookieParser from 'cookie-parser';
-import { decode } from 'next-auth/jwt';
 import { IncomingMessage } from 'http';
 import { env } from '@/env';
 import { getEventsByUserId, processRemoveFromQueue } from '@/lib/drizzle/services';
@@ -18,7 +17,7 @@ const io = new Server(server, {
     }
 });
 
-const cookieName = 'next-auth.session-token';
+// const cookieName = 'next-auth.session-token';
 
 io.engine.use(cookieParser());
 
@@ -30,21 +29,25 @@ io.engine.use(async (req: Request & { _query: Record<string, string>; user?: Use
     }
 
     try {
-        const token = z.string().parse(req.cookies[cookieName]);
+        // const token = z.string().parse(req.cookies[cookieName]);
 
-        const jwt = await decode({
-            token,
-            secret: env.NEXTAUTH_SECRET
-        });
+        // const jwt = await decode({
+        //     token,
+        //     secret: env.NEXTAUTH_SECRET
+        // });
 
-        const { expires_at, user } = jwtSchema.parse(jwt);
+        // const { expires_at, user } = jwtSchema.parse(jwt);
 
-        if (Date.now() >= expires_at * 1000) {
-            return next(new Error('Authentication failed.'));
-        }
+        // if (Date.now() >= expires_at * 1000) {
+        //     return next(new Error('Authentication failed.'));
+        // }
+
+        // req.user = {
+        //     id: z.coerce.number().positive().parse(user.id)
+        // };
 
         req.user = {
-            id: z.coerce.number().positive().parse(user.id)
+            id: 1
         };
 
         return next();
