@@ -3,11 +3,11 @@ import { Pool } from 'pg';
 import { env } from '@/env';
 
 const pool = new Pool({
-    host: 'postgres',
-    port: 5432,
-    user: env.POSTGRES_USER,
-    password: env.POSTGRES_PASSWORD,
-    database: 'release-queue',
+    host: env.DB_HOST,
+    port: env.DB_PORT,
+    user: env.DB_USER,
+    password: env.DB_PASSWORD,
+    database: env.DB_NAME,
     ssl: false
 });
 

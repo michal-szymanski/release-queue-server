@@ -8,8 +8,8 @@ export default defineConfig({
     dbCredentials: {
         host: '0.0.0.0',
         port: 5432,
-        user: env.POSTGRES_USER,
-        password: env.POSTGRES_PASSWORD,
+        user: env.DB_USER,
+        password: env.DB_PASSWORD,
         database: 'release-queue',
         ssl: false
     },
