@@ -41,13 +41,18 @@ export const mergeRequestSchema = z.object({
 });
 
 export const jwtSchema = z.object({
-    name: z.string(),
-    email: z.string(),
-    picture: z.string(),
-    sub: z.string(),
+    access_token: z.string(),
+    refresh_token: z.string(),
+    expires_at: z.number(),
     iat: z.number(),
     exp: z.number(),
-    jti: z.string()
+    jti: z.string(),
+    user: z.object({
+        id: z.string(),
+        name: z.string(),
+        email: z.string(),
+        image: z.string()
+    })
 });
 
 export type User = {

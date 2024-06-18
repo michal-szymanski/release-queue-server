@@ -37,14 +37,14 @@ io.engine.use(async (req: Request & { _query: Record<string, string>; user?: Use
             secret: env.NEXTAUTH_SECRET
         });
 
-        const { exp, sub } = jwtSchema.parse(jwt);
+        const { expires_at, user } = jwtSchema.parse(jwt);
 
-        if (new Date() > new Date(exp * 1000)) {
+        if (Date.now() >= expires_at * 1000) {
             return next(new Error('Authentication failed.'));
         }
 
         req.user = {
-            id: z.coerce.number().positive().parse(sub)
+            id: z.coerce.number().positive().parse(user.id)
         };
 
         return next();
