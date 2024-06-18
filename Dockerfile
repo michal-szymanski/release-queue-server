@@ -4,7 +4,7 @@ RUN npm install -g pnpm
 
 WORKDIR /usr/src/app
 
-COPY package.json pnpm-lock.yaml .env tsconfig.json drizzle.config.ts .prettierrc .prettierignore ./
+COPY package.json pnpm-lock.yaml tsconfig.json drizzle.config.ts .prettierrc .prettierignore ./
 COPY src/ src/
 
 RUN pnpm install
