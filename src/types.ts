@@ -55,10 +55,6 @@ export const jwtSchema = z.object({
     })
 });
 
-export type User = {
-    id: number;
-};
-
 export const pipelineSchema = z.object({
     object_attributes: z.object({
         id: z.number()

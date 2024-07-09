@@ -4,11 +4,19 @@ import { getMergeRequestById } from '@/lib/drizzle/queries/merge-requests';
 import { addToQueue, qetQueue, stepBackInQueue } from '@/lib/drizzle/queries/queue';
 import { z } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
-import { jwtSchema, mergeRequestSchema, User } from '@/types';
+import { jwtSchema, mergeRequestSchema } from '@/types';
 import cookieParser from 'cookie-parser';
 import { IncomingMessage } from 'http';
 import { env } from '@/env';
 import { getEventsByUserId, processRemoveFromQueue } from '@/lib/drizzle/services';
+import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node';
+import { clerkClient, User } from '@clerk/clerk-sdk-node';
+
+declare global {
+    namespace Express {
+        interface Request extends StrictAuthProp {}
+    }
+}
 
 const io = new Server(server, {
     cors: {
@@ -20,8 +28,9 @@ const io = new Server(server, {
 // const cookieName = 'next-auth.session-token';
 
 io.engine.use(cookieParser());
+io.engine.use(ClerkExpressRequireAuth());
 
-io.engine.use(async (req: Request & { _query: Record<string, string>; user?: User }, _res: Response, next: NextFunction) => {
+io.engine.use(async (req: RequireAuthProp<Request> & { _query: Record<string, string>; user?: User }, _res: Response, next: NextFunction) => {
     const isHandshake = req._query.sid === undefined;
 
     if (!isHandshake) {
@@ -29,6 +38,10 @@ io.engine.use(async (req: Request & { _query: Record<string, string>; user?: Use
     }
 
     try {
+        const user = await clerkClient.users.getUser(req.auth.userId);
+        console.log(user);
+        console.log({ userId: user.externalAccounts[0].externalId });
+
         // const token = z.string().parse(req.cookies[cookieName]);
 
         // const jwt = await decode({
@@ -46,9 +59,7 @@ io.engine.use(async (req: Request & { _query: Record<string, string>; user?: Use
         //     id: z.coerce.number().positive().parse(user.id)
         // };
 
-        req.user = {
-            id: 1
-        };
+        req.user = user;
 
         return next();
     } catch {
@@ -90,9 +101,11 @@ io.on('connection', async (socket) => {
         return;
     }
 
-    socket.join(`user:${user.id}`);
+    const userId = z.coerce.number().parse(user.externalAccounts[0].externalId);
 
-    await emitEvents(user.id);
+    socket.join(`user:${userId}`);
+
+    await emitEvents(userId);
     await emitQueue();
 
     socket.on('add-to-queue', async (payload) => {
