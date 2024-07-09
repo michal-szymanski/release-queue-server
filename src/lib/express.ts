@@ -7,7 +7,8 @@ const app = express();
 
 app.use(
     cors({
-        origin: [env.WEB_APP_URL, 'http://localhost:3000']
+        origin: [env.WEB_APP_URL, 'http://localhost:3000'],
+        credentials: true
     })
 );
 app.use(express.json());
