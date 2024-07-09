@@ -1,10 +1,8 @@
 {
-  "id": "06dc51bc-6858-49f9-b80b-8638ef599163",
-  "prevId": "b6483dad-08d5-48ce-844c-d770ec954d5d",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "jobs": {
+    "public.jobs": {
       "name": "jobs",
       "schema": "",
       "columns": {
@@ -32,7 +30,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "merge_requests": {
+    "public.merge_requests": {
       "name": "merge_requests",
       "schema": "",
       "columns": {
@@ -66,7 +64,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "pipelines": {
+    "public.pipelines": {
       "name": "pipelines",
       "schema": "",
       "columns": {
@@ -94,7 +92,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "queue": {
+    "public.queue": {
       "name": "queue",
       "schema": "",
       "columns": {
@@ -128,15 +126,15 @@
         "queue_merge_request_id_merge_requests_id_fk": {
           "name": "queue_merge_request_id_merge_requests_id_fk",
           "tableFrom": "queue",
-          "tableTo": "merge_requests",
           "columnsFrom": [
             "merge_request_id"
           ],
+          "tableTo": "merge_requests",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -146,8 +144,10 @@
   "enums": {},
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "06dc51bc-6858-49f9-b80b-8638ef599163",
+  "prevId": "b6483dad-08d5-48ce-844c-d770ec954d5d"
 }

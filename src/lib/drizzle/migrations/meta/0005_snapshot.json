@@ -1,10 +1,8 @@
 {
-  "id": "e10681e2-3f3a-4b01-8935-df89377cd5c6",
-  "prevId": "21480965-3b0f-4b46-9135-0033d177df16",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "jobs": {
+    "public.jobs": {
       "name": "jobs",
       "schema": "",
       "columns": {
@@ -32,21 +30,21 @@
         "jobs_pipeline_id_pipelines_id_fk": {
           "name": "jobs_pipeline_id_pipelines_id_fk",
           "tableFrom": "jobs",
-          "tableTo": "pipelines",
           "columnsFrom": [
             "pipeline_id"
           ],
+          "tableTo": "pipelines",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "merge_requests": {
+    "public.merge_requests": {
       "name": "merge_requests",
       "schema": "",
       "columns": {
@@ -80,7 +78,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "pipelines": {
+    "public.pipelines": {
       "name": "pipelines",
       "schema": "",
       "columns": {
@@ -108,7 +106,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "queue": {
+    "public.queue": {
       "name": "queue",
       "schema": "",
       "columns": {
@@ -130,15 +128,15 @@
         "queue_merge_request_id_merge_requests_id_fk": {
           "name": "queue_merge_request_id_merge_requests_id_fk",
           "tableFrom": "queue",
-          "tableTo": "merge_requests",
           "columnsFrom": [
             "merge_request_id"
           ],
+          "tableTo": "merge_requests",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -148,8 +146,10 @@
   "enums": {},
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "e10681e2-3f3a-4b01-8935-df89377cd5c6",
+  "prevId": "21480965-3b0f-4b46-9135-0033d177df16"
 }

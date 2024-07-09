@@ -1,4 +1,6 @@
 {
+  "id": "d6f50e1c-b8e4-4a70-ab1e-72a628ad0e2b",
+  "prevId": "06376bd6-c49f-40a8-96e9-d6f5c544f710",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -8,7 +10,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": true,
           "notNull": true
         },
@@ -36,7 +38,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": true,
           "notNull": true
         },
@@ -70,7 +72,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": true,
           "notNull": true
         },
@@ -132,15 +134,15 @@
         "queue_merge_request_id_merge_requests_id_fk": {
           "name": "queue_merge_request_id_merge_requests_id_fk",
           "tableFrom": "queue",
+          "tableTo": "merge_requests",
           "columnsFrom": [
             "merge_request_id"
           ],
-          "tableTo": "merge_requests",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -150,10 +152,8 @@
   "enums": {},
   "schemas": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "id": "d59f575d-c759-47c3-b9be-ba476cb021d9",
-  "prevId": "06dc51bc-6858-49f9-b80b-8638ef599163"
+    "tables": {}
+  }
 }

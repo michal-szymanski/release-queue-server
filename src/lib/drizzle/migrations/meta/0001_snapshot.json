@@ -1,10 +1,8 @@
 {
-  "id": "b99dd4c5-fa25-45dd-b459-57a59f67108b",
-  "prevId": "8f7ddccc-d2d1-4c17-ac74-befb29d7650b",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "merge_requests": {
+    "public.merge_requests": {
       "name": "merge_requests",
       "schema": "",
       "columns": {
@@ -32,7 +30,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "queue": {
+    "public.queue": {
       "name": "queue",
       "schema": "",
       "columns": {
@@ -54,15 +52,15 @@
         "queue_merge_request_id_merge_requests_id_fk": {
           "name": "queue_merge_request_id_merge_requests_id_fk",
           "tableFrom": "queue",
-          "tableTo": "merge_requests",
           "columnsFrom": [
             "merge_request_id"
           ],
+          "tableTo": "merge_requests",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -72,8 +70,10 @@
   "enums": {},
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "b99dd4c5-fa25-45dd-b459-57a59f67108b",
+  "prevId": "8f7ddccc-d2d1-4c17-ac74-befb29d7650b"
 }

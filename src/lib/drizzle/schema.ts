@@ -1,9 +1,9 @@
-import { date, json, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { bigint, date, json, pgTable, serial, text } from 'drizzle-orm/pg-core';
 import { integer } from 'drizzle-orm/pg-core/columns/integer';
 import { relations } from 'drizzle-orm';
 
 export const mergeRequestsTable = pgTable('merge_requests', {
-    id: integer('id').primaryKey(),
+    id: bigint('id', { mode: 'number' }).primaryKey(),
     authorId: integer('author_id').notNull(),
     commitId: text('commit_id').notNull(),
     json: json('json').notNull()
@@ -20,13 +20,13 @@ export const queueTable = pgTable('queue', {
 });
 
 export const pipelinesTable = pgTable('pipelines', {
-    id: integer('id').primaryKey(),
+    id: bigint('id', { mode: 'number' }).primaryKey(),
     commitId: text('commit_id').notNull(),
     json: json('json').notNull()
 });
 
 export const jobsTable = pgTable('jobs', {
-    id: integer('id').primaryKey(),
+    id: bigint('id', { mode: 'number' }).primaryKey(),
     pipelineId: integer('pipeline_id').notNull(),
     json: json('json').notNull()
 });

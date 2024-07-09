@@ -13,6 +13,10 @@ export default defineConfig({
         database: env.DB_NAME,
         ssl: false
     },
+    migrations: {
+        table: 'migrations',
+        schema: 'public'
+    },
     verbose: true,
     strict: true
 });
