@@ -58,7 +58,7 @@ export const handleEvent = async (event: GitLabEvent, message: unknown) => {
             }
         }
         default: {
-            throw Error(`Missing handler for queue ${event}.`);
+            throw Error(`Missing handler for ${event} event.`);
         }
     }
 };

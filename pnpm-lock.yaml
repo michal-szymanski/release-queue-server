@@ -11,6 +11,9 @@ dependencies:
   '@types/cookie-parser':
     specifier: ^1.4.7
     version: 1.4.7
+  '@types/cors':
+    specifier: ^2.8.17
+    version: 2.8.17
   '@types/express':
     specifier: ^4.17.21
     version: 4.17.21
@@ -20,6 +23,9 @@ dependencies:
   cookie-parser:
     specifier: ^1.4.6
     version: 1.4.6
+  cors:
+    specifier: ^2.8.5
+    version: 2.8.5
   dotenv:
     specifier: ^16.4.5
     version: 16.4.5
