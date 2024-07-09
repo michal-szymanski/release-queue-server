@@ -27,7 +27,7 @@ export const pipelinesTable = pgTable('pipelines', {
 
 export const jobsTable = pgTable('jobs', {
     id: bigint('id', { mode: 'number' }).primaryKey(),
-    pipelineId: integer('pipeline_id').notNull(),
+    pipelineId: bigint('pipeline_id', { mode: 'number' }).notNull(),
     json: json('json').notNull()
 });
 

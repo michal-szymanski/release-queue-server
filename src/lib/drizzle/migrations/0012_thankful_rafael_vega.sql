@@ -1,0 +1,1 @@
+ALTER TABLE "jobs" ALTER COLUMN "pipeline_id" SET DATA TYPE bigint;
