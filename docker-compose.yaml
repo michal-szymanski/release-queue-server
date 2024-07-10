@@ -1,17 +1,17 @@
 version: '3.8'
 services:
-    postgres:
-        image: postgres:latest
-        container_name: postgres
-        environment:
-            DB_USER: '${DB_USER}'
-            DB_PASSWORD: '${DB_PASSWORD}'
-            DB_HOST: '${DB_HOST}'
-            POSTGRES_DB: '${DB_NAME}'
-        ports:
-            - '5432:5432'
-        volumes:
-            - ./data:/var/lib/postgresql/data
+    # postgres:
+    #     image: postgres:latest
+    #     container_name: postgres
+    #     environment:
+    #         DB_USER: '${DB_USER}'
+    #         DB_PASSWORD: '${DB_PASSWORD}'
+    #         DB_HOST: '${DB_HOST}'
+    #         POSTGRES_DB: '${DB_NAME}'
+    #     ports:
+    #         - '5432:5432'
+    #     volumes:
+    #         - ./data:/var/lib/postgresql/data
     server:
         container_name: server
         build: .
@@ -19,5 +19,5 @@ services:
             - '${PORT}:${PORT}'
         env_file:
             - .env
-        depends_on:
-            - postgres
+        # depends_on:
+        #     - postgres
