@@ -24,7 +24,7 @@ app.use(
     cors({
         origin: '*',
         methods: ['GET', 'POST'],
-        allowedHeaders: ['Authorization', 'Content-Type'],
+        allowedHeaders: '*',
         credentials: true
     })
 );
@@ -44,7 +44,7 @@ const io = new Server(server, {
     cors: {
         origin: '*',
         methods: ['GET', 'POST'],
-        allowedHeaders: ['Authorization', 'Content-Type'],
+        allowedHeaders: '*',
         credentials: true
     }
 });
