@@ -46,8 +46,7 @@ const io = new Server(server, {
         methods: ['GET', 'POST'],
         allowedHeaders: ['Authorization'],
         credentials: true
-    },
-    transports: ['websocket', 'polling']
+    }
 });
 
 // io.engine.use(ClerkExpressRequireAuth());
@@ -80,6 +79,10 @@ io.engine.use(async (req: WithAuthProp<Request> & { _query: Record<string, strin
     } catch (e) {
         return next(e);
     }
+});
+
+io.engine.on('connection_error', (err) => {
+    console.log(err);
 });
 
 export const emitQueue = async () => {
