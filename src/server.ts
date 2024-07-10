@@ -5,7 +5,7 @@ import cors from 'cors';
 import { env } from '@/env';
 import { Server } from 'socket.io';
 import cookieParser from 'cookie-parser';
-import { clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, RequireAuthProp, LooseAuthProp, User } from '@clerk/clerk-sdk-node';
+import { clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, WithAuthProp, LooseAuthProp, User } from '@clerk/clerk-sdk-node';
 import { addToQueue, qetQueue, stepBackInQueue } from '@/lib/drizzle/queries/queue';
 import { getEventsByUserId, processJobInDb, processMergeRequestInDb, processPipelineInDb, processRemoveFromQueue } from '@/lib/drizzle/services';
 import { getMergeRequestById } from '@/lib/drizzle/queries/merge-requests';
@@ -55,7 +55,7 @@ const io = new Server(server, {
 //     secretKey: process.env.CLERK_SECRET_KEY
 // });
 
-io.engine.use(async (req: RequireAuthProp<Request> & { _query: Record<string, string>; user?: User }, _res: Response, next: NextFunction) => {
+io.engine.use(async (req: WithAuthProp<Request> & { _query: Record<string, string>; user?: User }, _res: Response, next: NextFunction) => {
     const isHandshake = req._query.sid === undefined;
 
     if (!isHandshake) {
@@ -66,6 +66,9 @@ io.engine.use(async (req: RequireAuthProp<Request> & { _query: Record<string, st
         // if (!isSignedIn) {
         //     return next(new Error('Unauthorized'));
         // }
+        if (!req.auth.userId) {
+            throw Error('Unauthorized');
+        }
 
         const user = await clerkClient.users.getUser(req.auth.userId);
         console.log({ userId: user.externalAccounts[0].externalId });
