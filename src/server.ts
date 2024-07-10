@@ -22,9 +22,9 @@ const app = express();
 
 app.use(
     cors({
-        origin: '*',
-        // methods: ['GET', 'POST'],
-        allowedHeaders: '*',
+        origin: ['http://localhost:3000'],
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['Authorization'],
         credentials: true
     })
 );
@@ -42,9 +42,9 @@ const server = createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: '*',
-        // methods: ['GET', 'POST'],
-        allowedHeaders: '*',
+        origin: ['http://localhost:3000'],
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['Authorization'],
         credentials: true
     },
     transports: ['websocket', 'polling']
