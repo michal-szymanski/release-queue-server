@@ -46,7 +46,8 @@ const io = new Server(server, {
         // methods: ['GET', 'POST'],
         allowedHeaders: '*',
         credentials: true
-    }
+    },
+    transports: ['websocket', 'polling']
 });
 
 // io.engine.use(ClerkExpressRequireAuth());
