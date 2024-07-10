@@ -50,17 +50,11 @@ const io = new Server(server, {
 });
 
 io.engine.use(cookieParser());
+// io.engine.use(ClerkExpressRequireAuth());
 
-io.engine.use((req: Request, res: Response, next: NextFunction) => {
-    ClerkExpressRequireAuth()(req, res, (err) => {
-        if (err) {
-            console.error(err);
-            res.status(401).send({ errors: [{ message: 'Authentication error' }] });
-            return;
-        }
-        next();
-    });
-});
+// const clerkClient = createClerkClient({
+//     secretKey: process.env.CLERK_SECRET_KEY
+// });
 
 io.engine.use(async (req: RequireAuthProp<Request> & { _query: Record<string, string>; user?: User }, _res: Response, next: NextFunction) => {
     const isHandshake = req._query.sid === undefined;
@@ -70,6 +64,11 @@ io.engine.use(async (req: RequireAuthProp<Request> & { _query: Record<string, st
     }
 
     try {
+        const { isSignedIn } = await clerkClient.authenticateRequest(req as any);
+
+        if (!isSignedIn) {
+            return next(new Error('Unauthorized'));
+        }
         const user = await clerkClient.users.getUser(req.auth.userId);
         console.log({ userId: user.externalAccounts[0].externalId });
 
