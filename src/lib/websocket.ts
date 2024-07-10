@@ -20,7 +20,9 @@ declare global {
 
 const io = new Server(server, {
     cors: {
-        origin: [env.WEB_APP_URL, 'http://localhost:3000']
+        //origin: [env.WEB_APP_URL, 'http://localhost:3000'],
+        origin: '*',
+        methods: ['GET', 'POST']
     }
 });
 
