@@ -20,8 +20,7 @@ declare global {
 
 const io = new Server(server, {
     cors: {
-        origin: [env.WEB_APP_URL, 'http://localhost:3000'],
-        credentials: true
+        origin: [env.WEB_APP_URL, 'http://localhost:3000']
     }
 });
 
@@ -39,7 +38,7 @@ io.engine.use(async (req: RequireAuthProp<Request> & { _query: Record<string, st
 
     try {
         const user = await clerkClient.users.getUser(req.auth.userId);
-        // console.log(user);
+        console.log(user);
         // console.log({ userId: user.externalAccounts[0].externalId });
 
         // const token = z.string().parse(req.cookies[cookieName]);
@@ -62,8 +61,8 @@ io.engine.use(async (req: RequireAuthProp<Request> & { _query: Record<string, st
         req.user = user;
 
         return next();
-    } catch {
-        return next(new Error('Authentication failed.'));
+    } catch (e) {
+        return next(e);
     }
 });
 
