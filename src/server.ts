@@ -22,7 +22,9 @@ const app = express();
 
 app.use(
     cors({
-        origin: [env.WEB_APP_URL, 'http://localhost:3000']
+        origin: '*',
+        methods: ['GET', 'POST'],
+        credentials: true
     })
 );
 
@@ -39,9 +41,9 @@ const server = createServer(app);
 
 const io = new Server(server, {
     cors: {
-        //origin: [env.WEB_APP_URL, 'http://localhost:3000'],
         origin: '*',
-        methods: ['GET', 'POST']
+        methods: ['GET', 'POST'],
+        credentials: true
     }
 });
 
