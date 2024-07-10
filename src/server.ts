@@ -50,7 +50,17 @@ const io = new Server(server, {
 });
 
 io.engine.use(cookieParser());
-io.engine.use(ClerkExpressRequireAuth());
+
+io.engine.use((req: Request, res: Response, next: NextFunction) => {
+    ClerkExpressRequireAuth()(req, res, (err) => {
+        if (err) {
+            console.error(err);
+            res.status(401).send({ errors: [{ message: 'Authentication error' }] });
+            return;
+        }
+        next();
+    });
+});
 
 io.engine.use(async (req: RequireAuthProp<Request> & { _query: Record<string, string>; user?: User }, _res: Response, next: NextFunction) => {
     const isHandshake = req._query.sid === undefined;
