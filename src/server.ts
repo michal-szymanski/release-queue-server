@@ -55,31 +55,31 @@ const io = new Server(server, {
 //     secretKey: process.env.CLERK_SECRET_KEY
 // });
 
-io.engine.use(async (req: WithAuthProp<Request> & { _query: Record<string, string>; user?: User }, _res: Response, next: NextFunction) => {
-    const isHandshake = req._query.sid === undefined;
+// io.engine.use(async (req: WithAuthProp<Request> & { _query: Record<string, string>; user?: User }, _res: Response, next: NextFunction) => {
+//     const isHandshake = req._query.sid === undefined;
 
-    if (!isHandshake) {
-        return next();
-    }
+//     if (!isHandshake) {
+//         return next();
+//     }
 
-    try {
-        // if (!isSignedIn) {
-        //     return next(new Error('Unauthorized'));
-        // }
-        if (!req.auth.userId) {
-            throw Error('Unauthorized');
-        }
+//     try {
+//         // if (!isSignedIn) {
+//         //     return next(new Error('Unauthorized'));
+//         // }
+//         if (!req.auth.userId) {
+//             throw Error('Unauthorized');
+//         }
 
-        const user = await clerkClient.users.getUser(req.auth.userId);
-        console.log({ userId: user.externalAccounts[0].externalId });
+//         const user = await clerkClient.users.getUser(req.auth.userId);
+//         console.log({ userId: user.externalAccounts[0].externalId });
 
-        req.user = user;
+//         req.user = user;
 
-        return next();
-    } catch (e) {
-        return next(e);
-    }
-});
+//         return next();
+//     } catch (e) {
+//         return next(e);
+//     }
+// });
 
 io.engine.on('connection_error', (err) => {
     console.log(err);
