@@ -5,7 +5,7 @@ import cors from 'cors';
 import { env } from '@/env';
 import { Server } from 'socket.io';
 import cookieParser from 'cookie-parser';
-import { clerkClient, ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp, User } from '@clerk/clerk-sdk-node';
+import { clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, RequireAuthProp, LooseAuthProp, User } from '@clerk/clerk-sdk-node';
 import { addToQueue, qetQueue, stepBackInQueue } from '@/lib/drizzle/queries/queue';
 import { getEventsByUserId, processJobInDb, processMergeRequestInDb, processPipelineInDb, processRemoveFromQueue } from '@/lib/drizzle/services';
 import { getMergeRequestById } from '@/lib/drizzle/queries/merge-requests';
@@ -14,7 +14,7 @@ import { z } from 'zod';
 
 declare global {
     namespace Express {
-        interface Request extends StrictAuthProp {}
+        interface Request extends LooseAuthProp {}
     }
 }
 
@@ -30,9 +30,9 @@ app.use(
 );
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cookieParser());
+app.use(ClerkExpressWithAuth());
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err);
     res.status(500).send({ errors: [{ message: 'Something went wrong' }] });
@@ -49,7 +49,6 @@ const io = new Server(server, {
     }
 });
 
-io.engine.use(cookieParser());
 // io.engine.use(ClerkExpressRequireAuth());
 
 // const clerkClient = createClerkClient({
@@ -64,11 +63,10 @@ io.engine.use(async (req: RequireAuthProp<Request> & { _query: Record<string, st
     }
 
     try {
-        const { isSignedIn } = await clerkClient.authenticateRequest(req as any);
+        // if (!isSignedIn) {
+        //     return next(new Error('Unauthorized'));
+        // }
 
-        if (!isSignedIn) {
-            return next(new Error('Unauthorized'));
-        }
         const user = await clerkClient.users.getUser(req.auth.userId);
         console.log({ userId: user.externalAccounts[0].externalId });
 
