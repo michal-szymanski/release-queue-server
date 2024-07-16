@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 // app.use(ClerkExpressWithAuth());
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error(err);
+    console.error('error_handler', err);
     res.status(500).send({ errors: [{ message: 'Something went wrong' }] });
 });
 
@@ -82,7 +82,7 @@ const io = new Server(server, {
 // });
 
 io.engine.on('connection_error', (err) => {
-    console.log(err);
+    console.log('connection_error', err);
 });
 
 export const emitQueue = async () => {
