@@ -24,8 +24,7 @@ app.use(
     cors({
         origin: ['http://localhost:3000'],
         methods: ['GET', 'POST'],
-        allowedHeaders: ['Authorization'],
-        credentials: true
+        allowedHeaders: ['Authorization']
     })
 );
 
@@ -44,8 +43,7 @@ const io = new Server(server, {
     cors: {
         origin: ['http://localhost:3000'],
         methods: ['GET', 'POST'],
-        allowedHeaders: ['Authorization'],
-        credentials: true
+        allowedHeaders: ['Authorization']
     }
 });
 
@@ -75,7 +73,7 @@ io.engine.use(ClerkExpressRequireAuth());
 // });
 
 io.engine.on('connection_error', (err) => {
-    console.log('connection_error', err);
+    console.log('connection_error', err.context);
 });
 
 export const emitQueue = async () => {
@@ -107,6 +105,7 @@ export const emitRepositoryUpdate = async (repositoryName: string) => {
 io.on('connection', async (socket) => {
     // const { user } = socket.request as IncomingMessage & { user?: User };
     const req = socket.request as RequireAuthProp<IncomingMessage>;
+
     const user = await clerkClient.users.getUser(req.auth.userId);
 
     // if (!user) {
