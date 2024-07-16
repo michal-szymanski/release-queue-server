@@ -14,7 +14,7 @@
         "prettier:check": "prettier . --check"
     },
     "dependencies": {
-        "@clerk/clerk-sdk-node": "^5.0.14",
+        "@clerk/clerk-sdk-node": "^5.0.16",
         "@types/cookie-parser": "^1.4.7",
         "@types/cors": "^2.8.17",
         "@types/express": "^4.17.21",
