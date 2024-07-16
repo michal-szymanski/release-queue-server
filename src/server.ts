@@ -32,7 +32,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-// app.use(ClerkExpressWithAuth());
+app.use(ClerkExpressWithAuth());
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error('error_handler', err);
     res.status(500).send({ errors: [{ message: 'Something went wrong' }] });
