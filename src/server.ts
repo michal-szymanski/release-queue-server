@@ -5,7 +5,7 @@ import cors from 'cors';
 import { env } from '@/env';
 import { Server } from 'socket.io';
 import cookieParser from 'cookie-parser';
-import { clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, WithAuthProp, LooseAuthProp, User } from '@clerk/clerk-sdk-node';
+import { clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, WithAuthProp, LooseAuthProp, User, RequireAuthProp } from '@clerk/clerk-sdk-node';
 import { addToQueue, qetQueue, stepBackInQueue } from '@/lib/drizzle/queries/queue';
 import { getEventsByUserId, processJobInDb, processMergeRequestInDb, processPipelineInDb, processRemoveFromQueue } from '@/lib/drizzle/services';
 import { getMergeRequestById } from '@/lib/drizzle/queries/merge-requests';
@@ -32,7 +32,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(ClerkExpressWithAuth());
+// app.use(ClerkExpressWithAuth());
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error('error_handler', err);
     res.status(500).send({ errors: [{ message: 'Something went wrong' }] });
@@ -49,29 +49,30 @@ const io = new Server(server, {
     }
 });
 
-io.engine.use(async (req: WithAuthProp<Request> & { _query: Record<string, string>; user?: User }, _res: Response, next: NextFunction) => {
-    const isHandshake = req._query.sid === undefined;
+io.engine.use(ClerkExpressRequireAuth());
+// io.engine.use(async (req: WithAuthProp<Request> & { _query: Record<string, string>; user?: User }, _res: Response, next: NextFunction) => {
+//     const isHandshake = req._query.sid === undefined;
 
-    if (!isHandshake) {
-        return next();
-    }
+//     if (!isHandshake) {
+//         return next();
+//     }
 
-    try {
-        if (!req.auth.userId) {
-            throw Error('Unauthorized');
-        }
+//     try {
+//         if (!req.auth.userId) {
+//             throw Error('Unauthorized');
+//         }
 
-        const user = await clerkClient.users.getUser(req.auth.userId);
-        console.log({ userId: user.externalAccounts[0].externalId });
+//         const user = await clerkClient.users.getUser(req.auth.userId);
+//         console.log({ userId: user.externalAccounts[0].externalId });
 
-        req.user = user;
+//         req.user = user;
 
-        return next();
-    } catch (e) {
-        console.error('Error in middleware:', e);
-        return next(e);
-    }
-});
+//         return next();
+//     } catch (e) {
+//         console.error('Error in middleware:', e);
+//         return next(e);
+//     }
+// });
 
 io.engine.on('connection_error', (err) => {
     console.log('connection_error', err);
@@ -104,13 +105,15 @@ export const emitRepositoryUpdate = async (repositoryName: string) => {
 };
 
 io.on('connection', async (socket) => {
-    const { user } = socket.request as IncomingMessage & { user?: User };
+    // const { user } = socket.request as IncomingMessage & { user?: User };
+    const req = socket.request as RequireAuthProp<IncomingMessage>;
+    const user = await clerkClient.users.getUser(req.auth.userId);
 
-    if (!user) {
-        console.log('No user found in socket request');
-        socket.disconnect(true);
-        return;
-    }
+    // if (!user) {
+    //     console.log('No user found in socket request');
+    //     socket.disconnect(true);
+    //     return;
+    // }
 
     const userId = z.coerce.number().parse(user.externalAccounts[0].externalId);
 
