@@ -49,12 +49,6 @@ const io = new Server(server, {
     }
 });
 
-// io.engine.use(ClerkExpressRequireAuth());
-
-// const clerkClient = createClerkClient({
-//     secretKey: process.env.CLERK_SECRET_KEY
-// });
-
 io.engine.use(async (req: WithAuthProp<Request> & { _query: Record<string, string>; user?: User }, _res: Response, next: NextFunction) => {
     const isHandshake = req._query.sid === undefined;
 
@@ -63,9 +57,6 @@ io.engine.use(async (req: WithAuthProp<Request> & { _query: Record<string, strin
     }
 
     try {
-        // if (!isSignedIn) {
-        //     return next(new Error('Unauthorized'));
-        // }
         if (!req.auth.userId) {
             throw Error('Unauthorized');
         }
@@ -77,6 +68,7 @@ io.engine.use(async (req: WithAuthProp<Request> & { _query: Record<string, strin
 
         return next();
     } catch (e) {
+        console.error('Error in middleware:', e);
         return next(e);
     }
 });
@@ -115,6 +107,7 @@ io.on('connection', async (socket) => {
     const { user } = socket.request as IncomingMessage & { user?: User };
 
     if (!user) {
+        console.log('No user found in socket request');
         socket.disconnect(true);
         return;
     }
